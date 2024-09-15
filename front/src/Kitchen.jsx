@@ -93,7 +93,7 @@ const Kitchen = ({ orders, setOrders }) => {
                                             ].map((button, index) => (
                                                 <button
                                                     key={index}
-                                                    className={`px-2 py-1 bg-slate-400 rounded-2xl font-semibold ${order.status === button.status ? 'text-black' : 'bg-slate-300 text-gray-100'} text-white`}
+                                                    className={`px-2 py-1 rounded-2xl font-semibold ${order.status === button.status ? 'text-black bg-slate-400' : 'bg-slate-300 text-gray-500'}`}
                                                     onClick={() => sendMessage(order.orderNumber, button.status)}>
                                                     {button.label}
                                                 </button>
