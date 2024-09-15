@@ -57,10 +57,10 @@ const Kitchen = ({ orders, setOrders }) => {
                                     }}>
 
                                     <div className='flex flex-col h-full text-gray-800'>
-                                        <div className='flex-shrink border-b-2 border-gray-800 font-bold'>#{order.orderNumber}</div>
-                                        <div className='flex-shrink border-b-2 border-gray-800 font-bold'>
+                                        <div className='flex-shrink border-b-2 border-gray-800 font-bold'>מספר הזמנה: {order.orderNumber}</div>
+                                        {/* <div className='flex-shrink border-b-2 border-gray-800 font-bold'>
                                             <StatusConvert status={order.status} />
-                                        </div>
+                                        </div> */}
                                         <div className='flex-1 overflow-y-auto'>
                                             <ul>
                                                 {order.orderItems.map((item, itemIndex) => (
@@ -68,24 +68,8 @@ const Kitchen = ({ orders, setOrders }) => {
                                                 ))}
                                             </ul>
                                         </div>
-                                        {/* <div className='flex-shrink flex justify-between items-end p-4'>
-                                            <button
-                                                className="px-2 py-1 bg-gray-200"
-                                                onClick={() => sendMessage(order.orderNumber, 0)}>
-                                                בהמתנה
-                                            </button>
-                                            <button
-                                                className="px-2 py-1 bg-gray-200"
-                                                onClick={() => sendMessage(order.orderNumber, 1)}>
-                                                בהכנה
-                                            </button>
-                                            <button
-                                                className="px-2 py-1 bg-gray-200"
-                                                onClick={() => sendMessage(order.orderNumber, 2)}>
-                                                מוכן
-                                            </button>
-                                        </div> */}
-                                        <div className='flex-shrink flex justify-between items-end p-4'>
+                                       
+                                        <div className='flex-shrink flex justify-between  items-end p-4'>
                                             {[
                                                 { label: 'בהמתנה', status: 0 },
                                                 { label: 'בהכנה', status: 1 },

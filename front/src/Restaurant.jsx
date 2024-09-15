@@ -15,7 +15,6 @@ const Restaurant = ({ orders, setOrders }) => {
             try {
                 let messageData;
 
-                // Always treat the incoming data as a Blob and convert it to text
                 const textData = await event.data.text(); // Convert Blob to text
                 messageData = JSON.parse(textData);       // Parse the text to JSON
 
@@ -59,7 +58,7 @@ const Restaurant = ({ orders, setOrders }) => {
     return (
         <>
             {/* top section */}
-            <div className="flex h-screen text-center text-4xl font-bold">
+            <div className="flex h-screen text-center text-4xl font-bold bg-orange-50">
                 <div className="flex-1">
                     <h2>הזמנות בהכנה</h2>
                     <div className="flex-row p-4 font-normal text-2xl">
@@ -68,7 +67,7 @@ const Restaurant = ({ orders, setOrders }) => {
                                 key={order.orderNumber}
                                 className="border-black border-b-2 p-2"
                             >
-                                <div>#{order.orderNumber}</div>
+                                <div className="font-bold text-3xl">{order.orderNumber}+ name</div>
                             </div>
                         ))}
                     </div>
@@ -89,13 +88,13 @@ const Restaurant = ({ orders, setOrders }) => {
                 {/* bottom section */}
                 <div className="flex-1">
                     <h2>הזמנות מוכנות</h2>
-                    <div className="flex-row gap-4 p-4 font-normal text-2xl">
+                    <div className="flex-row gap-4 p-4 font-bold text-2xl">
                         {readyOrders.map(order => (
                             <div
                                 key={order.orderNumber}
                                 className="border-black border-b-2 p-2"
                             >
-                                <div>#{order.orderNumber}</div>
+                                <div className="font-bold text-3xl">{order.orderNumber} + name?</div>
                             </div>
                         ))}
                     </div>

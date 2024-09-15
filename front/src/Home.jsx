@@ -25,37 +25,34 @@ const Home = () => {
 
     return (
         <>
-            <div className="bg-[#ffa900] h-screen">
-                <nav className="flex justify-center items-center bg-gray-800 p-4">
-                    <img src="/icon.png" alt="Logo" className="h-32" />
-                </nav>
-
-                <div className="flex justify-center items-center mt-32">
-                    <div className="flex flex-row space-x-4 items-center justify-center">
-
-                        <button className="btn btn-primary"
-                            onClick={() => navigate("/kitchen")}>
-                            <KitchenIcon className="btn-icon" />
-                            מטבח
-                        </button>
-
-                        <button className="btn btn-primary"
-                            onClick={() => navigate("/counter")}>
-                            <CounterIcon className="btn-icon" />
-                            דלפק
-                        </button>
-
-                        <button className="btn btn-primary"
-                            onClick={() => navigate("/restaurant")}>
-                            <RestaurantIcon className="btn-icon" />
-                            מסעדה
-                        </button>
-
-                    </div>
-                </div>
+          <div className="bg-[#ffa900] min-h-screen flex flex-col">
+            <nav className="bg-gray-800 p-4 flex justify-center items-center">
+              {/* {date} */}
+              <img src="/icon.png" alt="Logo" className="h-24" />
+            </nav>
+      
+            <div className="flex-grow flex justify-center items-center">
+              <div className="flex space-x-4 items-center">
+                <button className="btn btn-primary" onClick={() => navigate("/kitchen")}>
+                  <KitchenIcon className="btn-icon" />
+                  מטבח
+                </button>
+      
+                <button className="btn btn-primary" onClick={() => navigate("/counter")}>
+                  <CounterIcon className="btn-icon" />
+                  דלפק
+                </button>
+      
+                <button className="btn btn-primary" onClick={() => navigate("/restaurant")}>
+                  <RestaurantIcon className="btn-icon" />
+                  מסעדה
+                </button>
+              </div>
             </div>
+          </div>
         </>
-    );
+      );
+      
 
 };
 

@@ -17,7 +17,7 @@ function App() {
   const [orders, setOrders] = useState([
     {
       orderNumber: 1,
-      orderItems: ['בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי'],
+      orderItems: ['בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי','aaa','bebebe'],
       status: 0,
     },
     {
