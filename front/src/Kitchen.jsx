@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import StatusConvert from './StatusConvert';
 import Header from './Header';
+import OrderDetailsModal from './OrderDetailsModal'; // Import your modal component
 
 const socket = new WebSocket('ws://localhost:8081');
 
 const Kitchen = ({ orders, setOrders }) => {
     const [statusFilters, setStatusFilters] = useState([true, true, true]); // Default to show all statuses
+    const [showOrderDetails, setShowOrderDetails] = useState(false);
+    const [orderDetails, setOrderDetails] = useState([]);
 
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
@@ -59,33 +62,45 @@ const Kitchen = ({ orders, setOrders }) => {
                     {filteredOrders.length > 0 ? (
                         filteredOrders.map((order, orderIndex) => (
                             <div
-                                key={orderIndex}
-                                style={{
-                                    backgroundColor: 'wheat',
-                                    border: '2px solid #1a1a1a',
-                                    width: '300px',
-                                    height: '300px',
-                                    textAlign: 'center',
-                                    borderRadius: '20px',
+                            key={orderIndex}
+                            style={{
+                                backgroundColor: 'wheat',
+                                border: '2px solid #1a1a1a',
+                                width: '300px',
+                                height: '200px',
+                                textAlign: 'center',
+                                borderRadius: '20px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                overflow: 'hidden'
                                 }}>
 
                                 <div className='flex flex-col h-full text-gray-800'>
-                                    <div className='flex-shrink border-b-2 border-gray-800 font-bold text-xl'>
-                                        מספר הזמנה: {order.orderNumber}
+                                    <div className='flex-grow font-bold text-xl overflow-hidden text-ellipsis'>
+                                        <div>
+                                            מספר הזמנה: {order.orderNumber}<br />
+                                            סטטוס הזמנה: <StatusConvert status={order.status} />
+                                            <br />שם לקוח
+                                        </div>
                                     </div>
-                                    <div className='flex-1 overflow-y-auto'>
-                                        <ul>
-                                            {order.orderItems.map((item, itemIndex) => (
-                                                <li key={itemIndex}>{item}</li>
-                                            ))}
-                                        </ul>
+
+                                    <div className='flex-1 mt-2 justify-center flex items-center'>
+                                        <button
+                                            className="px-4 py-1 bg-gray-600 font-bold rounded-2xl border-2 border-gray-800"
+                                            onClick={() => {
+                                                setOrderDetails(order.orderItems); // Set order items
+                                                setShowOrderDetails(true); // Show the modal
+                                            }}
+                                        >
+                                            פרטי הזמנה
+                                        </button>
                                     </div>
 
                                     <div className='flex-shrink flex justify-between  items-end p-4'>
                                         {[{ label: 'בהמתנה', status: 0 }, { label: 'בהכנה', status: 1 }, { label: 'מוכן', status: 2 }].map((button, index) => (
                                             <button
                                                 key={index}
-                                                className={`px-2 py-1 rounded-2xl font-semibold ${order.status === button.status ? 'text-black bg-red-500' : 'bg-slate-300 text-gray-500'}`}
+                                                className={`px-2 py-1 rounded-2xl font-semibold ${order.status === button.status ? 'text-black bg-red-500 border-2 border-gray-800' : 'bg-slate-300 text-gray-500'}`}
                                                 onClick={() => sendMessage(order.orderNumber, button.status)}>
                                                 {button.label}
                                             </button>
@@ -99,6 +114,13 @@ const Kitchen = ({ orders, setOrders }) => {
                     )}
                 </div>
             </div>
+
+            {showOrderDetails && ( // Show the order details modal when triggered
+                <OrderDetailsModal
+                    items={orderDetails} // Pass the order items
+                    onClick={() => setShowOrderDetails(false)} // Close the modal
+                />
+            )}
         </>
     );
 };
