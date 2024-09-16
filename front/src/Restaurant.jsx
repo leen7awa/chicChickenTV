@@ -4,7 +4,6 @@ const socket = new WebSocket('ws://localhost:8081');
 
 const Restaurant = ({ orders, setOrders }) => {
 
-    const [message, setMessage] = useState('');
     const [status, setStatus] = useState('');
 
     const [readyOrders, setReadyOrders] = useState([]);
@@ -19,9 +18,12 @@ const Restaurant = ({ orders, setOrders }) => {
                 messageData = JSON.parse(textData);       // Parse the text to JSON
 
                 // Update the orders array with the new status
-                setOrders(prevOrders => prevOrders.map(order =>
-                    order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                ));
+                setOrders(prevOrders => {
+                    const updatedOrders = prevOrders.map(order =>
+                        order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                    );
+                    return updatedOrders; // Returning updated orders to save to session storage in App component
+                });
                 setStatus(`Order ${messageData.orderNumber} status updated to ${messageData.status}`);
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
@@ -67,7 +69,7 @@ const Restaurant = ({ orders, setOrders }) => {
                                 key={order.orderNumber}
                                 className="border-black border-b-2 p-2"
                             >
-                                <div className="font-bold text-3xl">{order.orderNumber}+ name</div>
+                                <div className="font-bold text-3xl">{order.orderNumber} + name</div>
                             </div>
                         ))}
                     </div>
@@ -75,7 +77,6 @@ const Restaurant = ({ orders, setOrders }) => {
 
                 {/* middle section */}
                 <div className="flex-grow flex w-32 justify-center items-center">
-                    {/* <h2>תמונות</h2> */}
                     <div className="w-full h-full flex justify-center items-center">
                         <img
                             src={`/images/${images[currentImageIndex]}`}

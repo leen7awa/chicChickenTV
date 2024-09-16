@@ -48,7 +48,7 @@ const Header = ({ title, imageUrl, onToggleStatuses }) => {
     };
 
     const statusLabels = title === 'דלפק' 
-        ? ['בהמתנה', 'בהכנה', 'מוכן', 'סיום'] 
+        ? ['בהמתנה', 'בהכנה', 'מוכן'] 
         : ['בהמתנה', 'בהכנה', 'מוכן']; // Conditionally select statuses
 
     return (

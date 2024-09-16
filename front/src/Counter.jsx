@@ -16,6 +16,14 @@ const Counter = ({ orders, setOrders }) => {
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
         socket.send(message); // Send order number and new status to WebSocket
+
+        // Update order status in the frontend immediately after sending the WebSocket message
+        setOrders(prevOrders => {
+            const updatedOrders = prevOrders.map(order =>
+                order.orderNumber === orderNumber ? { ...order, status: newStatus } : order
+            );
+            return updatedOrders;
+        });
     };
 
     useEffect(() => {
@@ -26,6 +34,7 @@ const Counter = ({ orders, setOrders }) => {
                 const textData = await event.data.text();
                 messageData = JSON.parse(textData);
 
+                // Update the orders when a message is received from the WebSocket
                 setOrders(prevOrders => prevOrders.map(order =>
                     order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
                 ));
@@ -35,15 +44,15 @@ const Counter = ({ orders, setOrders }) => {
         };
     }, [setOrders]);
 
-    // Filter orders based on the statusFilters array
-    const filteredOrders = orders.filter((order) => statusFilters[order.status]);
+    // Filter orders to include only those with status < 3
+    const filteredOrders = orders.filter((order) => order.status < 3);
 
     return (
         <>
             <div className="bg-[#ffa900] h-screen overflow-y-auto">
                 <Header title='דלפק' onToggleStatuses={setStatusFilters} /> {/* Pass the toggle handler */}
 
-                <div
+                {<div
                     style={{
                         display: 'flex',
                         flexWrap: 'wrap',
@@ -73,9 +82,8 @@ const Counter = ({ orders, setOrders }) => {
                                         <div>
                                             מספר הזמנה: {order.orderNumber}<br />
                                             סטטוס הזמנה: <StatusConvert status={order.status} />
-                                            <br/>שם לקוח
+                                            <br />שם לקוח
                                         </div>
-                                        {/* <div style={{ fontSize: 'smaller' }}>שם לקוח</div> */}
                                     </div>
 
                                     <div className='flex-1 mt-2 justify-center flex items-center'>
@@ -107,20 +115,32 @@ const Counter = ({ orders, setOrders }) => {
                     ) : (
                         <div className='text-gray-800 font-mono mt-44 text-3xl font-bold'>אין הזמנות</div>
                     )}
-
-                </div>
+                </div>}
             </div>
 
             {showConfirmation && (
                 <ConfirmationModal
                     message={<span dir="rtl">לסיים את ההזמנה?</span>}
                     onConfirm={() => {
+                        // Update the status and remove the order from session storage
                         sendMessage(finishOrderItem, 3);
+
+                        setOrders(prevOrders => {
+                            // Filter out the finished order
+                            const updatedOrders = prevOrders.filter(order => order.orderNumber !== finishOrderItem);
+
+                            // Update session storage
+                            sessionStorage.setItem('orders', JSON.stringify(updatedOrders));
+
+                            return updatedOrders;
+                        });
+
                         setShowConfirmation(false);
                     }}
                     onCancel={() => setShowConfirmation(false)}
                 />
             )}
+
 
             {showOrderDetails && ( // Show the order details modal when triggered
                 <OrderDetailsModal
@@ -128,7 +148,6 @@ const Counter = ({ orders, setOrders }) => {
                     onClick={() => setShowOrderDetails(false)} // Close the modal
                 />
             )}
-
         </>
     );
 };

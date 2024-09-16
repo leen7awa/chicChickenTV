@@ -10,6 +10,14 @@ const Kitchen = ({ orders, setOrders }) => {
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
         socket.send(message); // Send order number and new status to WebSocket
+
+        // Update order status in the frontend immediately after sending the WebSocket message
+        setOrders(prevOrders => {
+            const updatedOrders = prevOrders.map(order =>
+                order.orderNumber === orderNumber ? { ...order, status: newStatus } : order
+            );
+            return updatedOrders;
+        });
     };
 
     useEffect(() => {
@@ -20,6 +28,7 @@ const Kitchen = ({ orders, setOrders }) => {
                 const textData = await event.data.text();
                 messageData = JSON.parse(textData);
 
+                // Update the orders when a message is received from the WebSocket
                 setOrders(prevOrders => prevOrders.map(order =>
                     order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
                 ));
@@ -73,11 +82,7 @@ const Kitchen = ({ orders, setOrders }) => {
                                     </div>
 
                                     <div className='flex-shrink flex justify-between  items-end p-4'>
-                                        {[
-                                            { label: 'בהמתנה', status: 0 },
-                                            { label: 'בהכנה', status: 1 },
-                                            { label: 'מוכן', status: 2 },
-                                        ].map((button, index) => (
+                                        {[{ label: 'בהמתנה', status: 0 }, { label: 'בהכנה', status: 1 }, { label: 'מוכן', status: 2 }].map((button, index) => (
                                             <button
                                                 key={index}
                                                 className={`px-2 py-1 rounded-2xl font-semibold ${order.status === button.status ? 'text-black bg-red-500' : 'bg-slate-300 text-gray-500'}`}
