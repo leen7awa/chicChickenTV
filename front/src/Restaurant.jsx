@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Header from "./Header";
+// import Header from "./Header";
+import RestaurantHeader from "./RestaurantHeader";
 
 // const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
 const socket = new WebSocket('ws://localhost:8081');
@@ -62,17 +63,18 @@ const Restaurant = ({ orders, setOrders }) => {
     return (
         <>
             {/* top section */}
-                <Header title={''}/>
+                <RestaurantHeader/>
             <div className="flex h-screen text-center text-4xl font-bold bg-yellow-100">
                 <div className="flex-1">
-                    <h2>הזמנות בהכנה</h2>
+                    {/* <h2>הזמנות בהכנה</h2> */}
                     <div className="flex-row p-4 font-normal text-2xl">
                         {preppingOrders.map(order => (
                             <div
                                 key={order.orderNumber}
-                                className="border-black border-b-2 p-2"
+                                className="border-black border-b-2 p-2 justify justify-between flex"
                             >
-                                <div className="font-bold text-3xl">{order.orderNumber} + name</div>
+                                <div className="font-bold text-3xl">{order.orderNumber}</div>
+                                <div className="font-bold text-3xl">{order.customerName}</div>
                             </div>
                         ))}
                     </div>
@@ -84,22 +86,23 @@ const Restaurant = ({ orders, setOrders }) => {
                         <img
                             src={`/images/${images[currentImageIndex]}`}
                             alt={`Restaurant Image ${currentImageIndex + 1}`}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-fill"
                         />
                     </div>
                 </div>
 
                 {/* bottom section */}
                 <div className="flex-1">
-                    <h2>הזמנות מוכנות</h2>
+                    {/* <h2>הזמנות מוכנות</h2> */}
                     <div className="flex-row gap-4 p-4 font-bold text-2xl">
                         {readyOrders.map(order => (
                             <div
-                                key={order.orderNumber}
-                                className="border-black border-b-2 p-2"
-                            >
-                                <div className="font-bold text-3xl">{order.orderNumber} + name?</div>
-                            </div>
+                            key={order.orderNumber}
+                            className="border-black border-b-2 p-2 justify justify-between flex"
+                        >
+                            <div className="font-bold text-3xl">{order.orderNumber}</div>
+                            <div className="font-bold text-3xl">{order.customerName}</div>
+                        </div>
                         ))}
                     </div>
                 </div>

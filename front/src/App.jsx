@@ -21,38 +21,15 @@ function App() {
     return savedOrders ? JSON.parse(savedOrders) : [
       {
         orderNumber: 1,
-        orderItems: ['בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa'],
+        customerName: 'משה',
+        orderItems: ['2 בורגר קריספי', 'קולה','עוף','סלט קיסר','סלט עוף'],
         status: 0,
       },
       {
         orderNumber: 2,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 1,
-      },
-      {
-        orderNumber: 78,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 2,
-      },
-      {
-        orderNumber: 3,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 2,
-      },
-      {
-        orderNumber: 4,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 3,
-      },
-      {
-        orderNumber: 5,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 1,
-      },
-      {
-        orderNumber: 6,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 1,
+        customerName: 'לין',
+        orderItems: ['סלט', 'פסטה', '4 תפוזים'],
+        status: 0,
       },
     ];
   };

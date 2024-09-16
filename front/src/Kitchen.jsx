@@ -81,7 +81,7 @@ const Kitchen = ({ orders, setOrders }) => {
                                         <div>
                                             מספר הזמנה: {order.orderNumber}<br />
                                             סטטוס הזמנה: <StatusConvert status={order.status} />
-                                            <br />שם לקוח
+                                            <br />שם לקוח: {order.customerName}
                                         </div>
                                     </div>
 

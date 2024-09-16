@@ -46,7 +46,7 @@ const Counter = ({ orders, setOrders }) => {
     }, [setOrders]);
 
     // Filter orders to include only those with status < 3
-    const filteredOrders = orders.filter((order) => order.status < 3);
+    const filteredOrders = orders.filter((order) => statusFilters[order.status]);
 
     return (
         <>
@@ -83,7 +83,7 @@ const Counter = ({ orders, setOrders }) => {
                                         <div>
                                             מספר הזמנה: {order.orderNumber}<br />
                                             סטטוס הזמנה: <StatusConvert status={order.status} />
-                                            <br />שם לקוח
+                                            <br />שם לקוח: {order.customerName}
                                         </div>
                                     </div>
 
