@@ -5,7 +5,7 @@ import Header from './Header';
 const socket = new WebSocket('ws://localhost:8081');
 
 const Counter = ({ orders, setOrders }) => {
-    const [status, setStatus] = useState('');
+    const [statusFilters, setStatusFilters] = useState([true, true, true, true]); // Default to show all statuses
 
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
@@ -23,18 +23,19 @@ const Counter = ({ orders, setOrders }) => {
                 setOrders(prevOrders => prevOrders.map(order =>
                     order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
                 ));
-                setStatus(`Order ${messageData.orderNumber} status updated to ${messageData.status}`);
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
             }
         };
     }, [setOrders]);
 
+    // Filter orders based on the statusFilters array
+    const filteredOrders = orders.filter((order) => statusFilters[order.status]);
+
     return (
         <>
             <div className="bg-[#ffa900] h-screen overflow-y-auto">
-
-                <Header title='דלפק' />
+                <Header title='דלפק' onToggleStatuses={setStatusFilters} /> {/* Pass the toggle handler */}
                 
                 <div
                     style={{
@@ -46,59 +47,43 @@ const Counter = ({ orders, setOrders }) => {
                         justifyContent: 'center'
                     }}
                 >
-                    {orders && orders.length > 0 ? (
-                        orders.map((order, orderIndex) => (
-                            order.status < 3 && (
-                                <div
-                                    key={orderIndex}
-                                    style={{
-                                        backgroundColor: 'wheat',
-                                        border: '2px solid #1a1a1a',
-                                        width: '300px',
-                                        height: '300px',
-                                        textAlign: 'center',
-                                        borderRadius: '20px',
-                                    }}>
-
-                                    <div className='flex flex-col h-full text-gray-800'>
-                                        <div className='flex-shrink border-b-2 border-gray-800 font-bold text-xl'>
-
-                                            מספר הזמנה: {order.orderNumber}<br />
-                                            סטטוס הזמנה: <StatusConvert
-                                                status={order.status}
-                                            />
-
-                                        </div>
-                                        <div className='flex-1 overflow-y-auto'>
-                                            <ul>
-                                                {order.orderItems.map((item, itemIndex) => (
-                                                    <li key={itemIndex}>{item}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                        {/* <div className='flex-shrink border-y-2 border-gray-800 font-semibold'>סטטוס הזמנה
-                                            <br />
-                                            <StatusConvert
-                                                status={order.status}
-                                            />
-                                        </div> */}
-                                        <div className='flex-shrink text-center p-4'>
-                                            <button
-                                                className="px-2 py-1 bg-gray-200"
-                                                onClick={() => sendMessage(order.orderNumber, 3)}>
-                                                סיום
-                                            </button>
-                                        </div>
+                    {filteredOrders.length > 0 ? (
+                        filteredOrders.map((order, orderIndex) => (
+                            <div
+                                key={orderIndex}
+                                style={{
+                                    backgroundColor: 'wheat',
+                                    border: '2px solid #1a1a1a',
+                                    width: '300px',
+                                    height: '300px',
+                                    textAlign: 'center',
+                                    borderRadius: '20px',
+                                }}>
+                                <div className='flex flex-col h-full text-gray-800'>
+                                    <div className='flex-shrink border-b-2 border-gray-800 font-bold text-xl'>
+                                        מספר הזמנה: {order.orderNumber}<br />
+                                        סטטוס הזמנה: <StatusConvert status={order.status} />
+                                    </div>
+                                    <div className='flex-1 overflow-y-auto'>
+                                        <ul>
+                                            {order.orderItems.map((item, itemIndex) => (
+                                                <li key={itemIndex}>{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className='flex-shrink text-center p-4'>
+                                        <button
+                                            className="px-2 py-1 bg-gray-200"
+                                            onClick={() => sendMessage(order.orderNumber, 3)}>
+                                            סיום
+                                        </button>
                                     </div>
                                 </div>
-                            )
+                            </div>
                         ))
                     ) : (
-                        <>
-                            <div className='text-gray-800 font-mono mt-44 text-3xl font-bold'>אין הזמנות</div>
-                        </>
+                        <div className='text-gray-800 font-mono mt-44 text-3xl font-bold'>אין הזמנות</div>
                     )}
-
                 </div>
             </div>
         </>
