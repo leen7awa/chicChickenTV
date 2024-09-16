@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import Header from "./Header";
 const socket = new WebSocket('ws://localhost:8081');
 
 const Restaurant = ({ orders, setOrders }) => {
@@ -52,7 +52,7 @@ const Restaurant = ({ orders, setOrders }) => {
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
-        }, 10000);
+        }, 3000);
 
         return () => clearInterval(intervalId);
     }, [images.length]);
@@ -60,7 +60,8 @@ const Restaurant = ({ orders, setOrders }) => {
     return (
         <>
             {/* top section */}
-            <div className="flex h-screen text-center text-4xl font-bold bg-orange-50">
+                <Header title={''}/>
+            <div className="flex h-screen text-center text-4xl font-bold bg-yellow-100">
                 <div className="flex-1">
                     <h2>הזמנות בהכנה</h2>
                     <div className="flex-row p-4 font-normal text-2xl">

@@ -14,14 +14,14 @@ function App() {
     2 - ready
     3 - finish  
   */
-  
+  sessionStorage.clear();
   // Function to retrieve orders from session storage
   const getOrdersFromSessionStorage = () => {
     const savedOrders = sessionStorage.getItem('orders');
     return savedOrders ? JSON.parse(savedOrders) : [
       {
         orderNumber: 1,
-        orderItems: ['בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe'],
+        orderItems: ['בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa'],
         status: 0,
       },
       {

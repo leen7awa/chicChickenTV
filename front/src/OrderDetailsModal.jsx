@@ -12,7 +12,7 @@ const OrderDetailsModal = ({ items, onClick }) => {
                         <h4>שעת קבלת הזמנה</h4>
                     </div>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 max-h-96 md:max-h-80 sm:max-h-64 overflow-y-auto">
                     <ul>
                         {items.map((item, index) => (
                             <li key={index}>{item}</li>
