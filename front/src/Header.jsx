@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FilterIcon from '../icons/FilterIcon';
 import './Header.css'
 const Header = ({ title, imageUrl }) => {
     const [currentDate, setCurrentDate] = useState('');
@@ -38,21 +39,34 @@ const Header = ({ title, imageUrl }) => {
 
     return (
         <nav className="flex bg-gray-800 text-[#ffa900] max-h-44 p-4 justify-between">
+
             <div className="flex-1">
-                {title === 'דלפק' && (
-                    <div className="w-fit mx-auto text-center">סינון לפי סטטוס
-                        <div className="absolute mt-2 mx-auto rounded-md shadow-lg py-2 space-x-4">
-                            {['בהמתנה', 'בהכנה', 'מוכן', 'סיום'].map((status, index) => (
-                                <label key={index} className="inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" className="sr-only peer" />
-                                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                    <span className="ms-3 text-sm font-medium">{status}</span>
-                                </label>
-                            ))}
+                {!imageUrl && (
+                    <div className="justify-start w-fit mx-auto text-center">
+                        <div className="flex flex-col items-start justify-between">
+                            <button className="text-base mt-2" onClick={toggleDropdown}>
+                                <FilterIcon />
+                            </button>
+                            {dropdownOpen && (
+                                <div className="flex flex-col bg-gray-700 absolute mt-8 mx-auto rounded-md shadow-lg py-2 space-y-4">
+                                    {['בהמתנה', 'בהכנה', 'מוכן', 'סיום'].map((status, index) => (
+                                        <label key={index} className="flex items-center cursor-pointer space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                className="sr-only peer"
+                                                defaultChecked={true}
+                                            />
+                                            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                            <span className="text-sm font-medium">{status}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
             </div>
+
 
             <div className="flex-1 text-center text-3xl font-bold">
                 {imageUrl ? (
