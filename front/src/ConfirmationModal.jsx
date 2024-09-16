@@ -4,7 +4,7 @@ import './windowMsg.css';
 const ConfirmationModal = ({ message, onConfirm, onCancel }) => {
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content bg-[#fff2cd] border-2 border-gray-800">
         <h3>{message}</h3>
         <div className="modal-buttons">
           <button
