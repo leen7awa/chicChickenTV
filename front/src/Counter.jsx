@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StatusConvert from './StatusConvert';
+import Header from './Header';
+
 const socket = new WebSocket('ws://localhost:8081');
 
 const Counter = ({ orders, setOrders }) => {
@@ -31,7 +33,9 @@ const Counter = ({ orders, setOrders }) => {
     return (
         <>
             <div className="bg-[#ffa900] h-screen overflow-y-auto">
-                <div className='text-center text-3xl font-bold w-full bg-gray-800 text-[#ffa900] p-4'>דלפק</div>
+
+                <Header title='דלפק' />
+                
                 <div
                     style={{
                         display: 'flex',
@@ -57,7 +61,14 @@ const Counter = ({ orders, setOrders }) => {
                                     }}>
 
                                     <div className='flex flex-col h-full text-gray-800'>
-                                        <div className='flex-shrink border-b-2 border-gray-800 font-bold'>#{order.orderNumber}</div>
+                                        <div className='flex-shrink border-b-2 border-gray-800 font-bold text-xl'>
+
+                                            מספר הזמנה: {order.orderNumber}<br />
+                                            סטטוס הזמנה: <StatusConvert
+                                                status={order.status}
+                                            />
+
+                                        </div>
                                         <div className='flex-1 overflow-y-auto'>
                                             <ul>
                                                 {order.orderItems.map((item, itemIndex) => (
@@ -65,12 +76,12 @@ const Counter = ({ orders, setOrders }) => {
                                                 ))}
                                             </ul>
                                         </div>
-                                        <div className='flex-shrink border-y-2 border-gray-800 font-semibold'>סטטוס הזמנה
-                                            <br/>
+                                        {/* <div className='flex-shrink border-y-2 border-gray-800 font-semibold'>סטטוס הזמנה
+                                            <br />
                                             <StatusConvert
                                                 status={order.status}
                                             />
-                                        </div>
+                                        </div> */}
                                         <div className='flex-shrink text-center p-4'>
                                             <button
                                                 className="px-2 py-1 bg-gray-200"

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StatusConvert from './StatusConvert';
+import Header from './Header';
+
 const socket = new WebSocket('ws://localhost:8081');
 
 const Kitchen = ({ orders, setOrders }) => {
@@ -31,7 +33,9 @@ const Kitchen = ({ orders, setOrders }) => {
     return (
         <>
             <div className="bg-[#ffa900] h-screen overflow-y-auto">
-                <div className='text-center text-3xl font-bold w-full bg-gray-800 text-[#ffa900] p-4'>מטבח</div>
+
+                <Header title='מטבח'/>
+
                 <div
                     style={{
                         display: 'flex',
@@ -57,10 +61,11 @@ const Kitchen = ({ orders, setOrders }) => {
                                     }}>
 
                                     <div className='flex flex-col h-full text-gray-800'>
-                                        <div className='flex-shrink border-b-2 border-gray-800 font-bold'>מספר הזמנה: {order.orderNumber}</div>
-                                        {/* <div className='flex-shrink border-b-2 border-gray-800 font-bold'>
-                                            <StatusConvert status={order.status} />
-                                        </div> */}
+                                        <div className='flex-shrink border-b-2 border-gray-800 font-bold text-xl'>
+                                            
+                                            מספר הזמנה: {order.orderNumber}
+                                            
+                                            </div>
                                         <div className='flex-1 overflow-y-auto'>
                                             <ul>
                                                 {order.orderItems.map((item, itemIndex) => (
@@ -68,7 +73,7 @@ const Kitchen = ({ orders, setOrders }) => {
                                                 ))}
                                             </ul>
                                         </div>
-                                       
+
                                         <div className='flex-shrink flex justify-between  items-end p-4'>
                                             {[
                                                 { label: 'בהמתנה', status: 0 },
@@ -77,7 +82,7 @@ const Kitchen = ({ orders, setOrders }) => {
                                             ].map((button, index) => (
                                                 <button
                                                     key={index}
-                                                    className={`px-2 py-1 rounded-2xl font-semibold ${order.status === button.status ? 'text-black bg-slate-400' : 'bg-slate-300 text-gray-500'}`}
+                                                    className={`px-2 py-1 rounded-2xl font-semibold ${order.status === button.status ? 'text-black bg-red-500' : 'bg-slate-300 text-gray-500'}`}
                                                     onClick={() => sendMessage(order.orderNumber, button.status)}>
                                                     {button.label}
                                                 </button>

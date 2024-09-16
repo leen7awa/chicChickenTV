@@ -1,3 +1,11 @@
+/* Center the flex container */
+.flex-grow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Button styles remain unchanged */
 .btn {
     justify-content: center;
     width: 16rem;
@@ -22,4 +30,17 @@
 
 .btn-icon {
     margin-bottom: 0.25rem;
+}
+
+/* Responsive media query */
+@media (max-width: 768px) {
+    .flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .btn {
+        width: 600px;
+        height: auto;
+    }
 }
