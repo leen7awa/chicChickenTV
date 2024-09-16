@@ -4,7 +4,8 @@ import ConfirmationModal from './ConfirmationModal';
 import Header from './Header';
 import OrderDetailsModal from './OrderDetailsModal'; // Import your modal component
 
-const socket = new WebSocket('https://chickenserver-601a0b60e55d.herokuapp.com/');
+// const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
+const socket = new WebSocket('ws://localhost:8081');
 
 const Counter = ({ orders, setOrders }) => {
     const [statusFilters, setStatusFilters] = useState([true, true, true, true]); // Default to show all statuses
