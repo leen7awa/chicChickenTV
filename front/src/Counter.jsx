@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import StatusConvert from './StatusConvert';
+import ConfirmationModal from './ConfirmationModal';
 import Header from './Header';
 
 const socket = new WebSocket('ws://localhost:8081');
 
 const Counter = ({ orders, setOrders }) => {
     const [statusFilters, setStatusFilters] = useState([true, true, true, true]); // Default to show all statuses
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [finishOrderItem, setFinishOrderItem] = useState('')
 
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
@@ -36,7 +39,7 @@ const Counter = ({ orders, setOrders }) => {
         <>
             <div className="bg-[#ffa900] h-screen overflow-y-auto">
                 <Header title='דלפק' onToggleStatuses={setStatusFilters} /> {/* Pass the toggle handler */}
-                
+
                 <div
                     style={{
                         display: 'flex',
@@ -71,13 +74,18 @@ const Counter = ({ orders, setOrders }) => {
                                             ))}
                                         </ul>
                                     </div>
-                                    <div className='flex-shrink text-center p-4'>
+                                    <div className='flex-shrink text-center p-4 border-t-2 border-gray-800'>
                                         <button
-                                            className="px-2 py-1 bg-gray-200"
-                                            onClick={() => sendMessage(order.orderNumber, 3)}>
+                                            className="px-2 py-1 bg-red-500 font-bold rounded-2xl border-2 border-gray-800"
+                                            onClick={() => {
+                                                setFinishOrderItem(order.orderNumber);
+                                                setShowConfirmation(true);
+                                            }}
+                                        >
                                             סיום
                                         </button>
                                     </div>
+
                                 </div>
                             </div>
                         ))
@@ -86,6 +94,17 @@ const Counter = ({ orders, setOrders }) => {
                     )}
                 </div>
             </div>
+
+            {showConfirmation && (
+                <ConfirmationModal
+                    message={<span dir="rtl">לסיים את ההזמנה?</span>}
+                    onConfirm={() => {
+                        sendMessage(finishOrderItem, 3);
+                        setShowConfirmation(false);
+                    }}
+                    onCancel={() => setShowConfirmation(false)}
+                />
+            )}
         </>
     );
 };
