@@ -14,7 +14,7 @@ function App() {
     2 - ready
     3 - finish  
   */
-  sessionStorage.clear();
+  // sessionStorage.clear();
   // Function to retrieve orders from session storage
   const getOrdersFromSessionStorage = () => {
     const savedOrders = sessionStorage.getItem('orders');
@@ -23,12 +23,15 @@ function App() {
         orderNumber: 1,
         customerName: 'משה',
         orderItems: ['2 בורגר קריספי', 'קולה','עוף','סלט קיסר','סלט עוף'],
+        date: "2024-09-14T15:45:30",
+        // date: new Date().toISOString()
         status: 0,
       },
       {
         orderNumber: 2,
         customerName: 'לין',
         orderItems: ['סלט', 'פסטה', '4 תפוזים'],
+        date: "2024-09-14T17:33:12",
         status: 0,
       },
     ];

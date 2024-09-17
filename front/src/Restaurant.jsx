@@ -13,21 +13,15 @@ const Restaurant = ({ orders, setOrders }) => {
     const [preppingOrders, setPreppingOrders] = useState([]);
 
     useEffect(() => {
-        socket.onmessage = async (event) => {
+        socket.onmessage = (event) => {
             try {
-                let messageData;
-
-                const textData = await event.data.text(); // Convert Blob to text
-                messageData = JSON.parse(textData);       // Parse the text to JSON
-
-                // Update the orders array with the new status
-                setOrders(prevOrders => {
-                    const updatedOrders = prevOrders.map(order =>
-                        order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                    );
-                    return updatedOrders; // Returning updated orders to save to session storage in App component
-                });
-                setStatus(`Order ${messageData.orderNumber} status updated to ${messageData.status}`);
+                // event.data is already a string, no need for .text()
+                const messageData = JSON.parse(event.data);
+    
+                // Update the orders when a message is received from the WebSocket
+                setOrders(prevOrders => prevOrders.map(order =>
+                    order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                ));
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
             }

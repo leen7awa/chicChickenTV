@@ -35,7 +35,10 @@ const RestaurantHeader = () => {
     return (
         <nav className="flex bg-gray-800 text-[#ffa900] max-h-44 p-4 justify-between">
             <div className="flex-1 text-left ml-16 text-3xl font-bold">
-                הזמנות בהכנה
+                <h2>הזמנות בהכנה</h2>
+                <h2>جاري التحضير</h2>
+                {/* הזמנות בהכנה
+            <br/>الطلبات في التحضير */}
             </div>
             <div className="flex-1 text-center">
                 <div style={{ fontSize: '18px', fontWeight: 'normal' }}>{currentDate}</div> {/* Smaller text */}
@@ -43,6 +46,7 @@ const RestaurantHeader = () => {
             </div>
             <div className="flex-1 text-right mr-16 text-3xl font-semibold">
                 הזמנות מוכנות
+                <br/>الطلبات الجاهزة
             </div>
         </nav>
     );
