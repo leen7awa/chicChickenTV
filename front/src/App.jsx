@@ -14,34 +14,34 @@ function App() {
     2 - ready
     3 - finish  
   */
-  // sessionStorage.clear();
-  // Function to retrieve orders from session storage
-  const getOrdersFromSessionStorage = () => {
-    const savedOrders = sessionStorage.getItem('orders');
+  // localStorage.clear(); // Use this only if you want to clear orders manually during development
+
+  // Function to retrieve orders from local storage
+  const getOrdersFromLocalStorage = () => {
+    const savedOrders = localStorage.getItem('orders');
     return savedOrders ? JSON.parse(savedOrders) : [
-      {
-        orderNumber: 1,
-        customerName: 'משה',
-        orderItems: ['2 בורגר קריספי', 'קולה','עוף','סלט קיסר','סלט עוף'],
-        date: "2024-09-14T15:45:30",
-        // date: new Date().toISOString()
-        status: 0,
-      },
-      {
-        orderNumber: 2,
-        customerName: 'לין',
-        orderItems: ['סלט', 'פסטה', '4 תפוזים'],
-        date: "2024-09-14T17:33:12",
-        status: 0,
-      },
+      // {
+      //   orderNumber: 1,
+      //   customerName: 'משה',
+      //   orderItems: ['2 בורגר קריספי', 'קולה','עוף','סלט קיסר','סלט עוף'],
+      //   date: "2024-09-14T15:45:30",
+      //   status: 0,
+      // },
+      // {
+      //   orderNumber: 2,
+      //   customerName: 'לין',
+      //   orderItems: ['סלט', 'פסטה', '4 תפוזים'],
+      //   date: "2024-09-14T17:33:12",
+      //   status: 0,
+      // },
     ];
   };
 
-  const [orders, setOrders] = useState(getOrdersFromSessionStorage);
+  const [orders, setOrders] = useState(getOrdersFromLocalStorage);
 
-  // Save orders to session storage whenever the orders state updates
+  // Save orders to local storage whenever the orders state updates
   useEffect(() => {
-    sessionStorage.setItem('orders', JSON.stringify(orders));
+    localStorage.setItem('orders', JSON.stringify(orders));
   }, [orders]);
 
   const updateOrderStatus = (orderNumber, newStatus) => {
@@ -61,6 +61,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/kitchen" element={<Kitchen orders={orders} setOrders={setOrders} />} />
           <Route path="/restaurant" element={<Restaurant orders={orders} setOrders={setOrders} />} />
           <Route path="/counter" element={<Counter orders={orders} setOrders={setOrders} />} />

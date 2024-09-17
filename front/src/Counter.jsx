@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import StatusConvert from './StatusConvert';
 import ConfirmationModal from './ConfirmationModal';
-import Header from './Header';
 import OrderDetailsModal from './OrderDetailsModal'; // Import your modal component
+import Header from './Header';
+import './card.css';
 
 // const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
 const socket = new WebSocket('ws://localhost:8081');
@@ -14,7 +15,7 @@ const Counter = ({ orders, setOrders }) => {
     const [showOrderDetails, setShowOrderDetails] = useState(false); // State for order details modal
     const [orderDetails, setOrderDetails] = useState([]); // State for order items
     const [selectedOrder, setSelectedOrder] = useState(null);
-    
+
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
         socket.send(message); // Send order number and new status to WebSocket
@@ -33,7 +34,7 @@ const Counter = ({ orders, setOrders }) => {
             try {
                 // event.data is already a string, no need for .text()
                 const messageData = JSON.parse(event.data);
-    
+
                 // Update the orders when a message is received from the WebSocket
                 setOrders(prevOrders => prevOrders.map(order =>
                     order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
@@ -66,6 +67,7 @@ const Counter = ({ orders, setOrders }) => {
                         filteredOrders.map((order, orderIndex) => (
                             <div
                                 key={orderIndex}
+                                className="order-card"
                                 style={{
                                     backgroundColor: 'wheat',
                                     border: '2px solid #1a1a1a',
@@ -78,13 +80,15 @@ const Counter = ({ orders, setOrders }) => {
                                     overflow: 'hidden' // Prevent overflow issues
                                 }}>
                                 <div className='flex flex-col h-full text-gray-800'>
-                                    <div className='flex-grow font-bold text-base overflow-hidden text-ellipsis sm:text-sm'>
-                                        <div>
-                                            מספר הזמנה: {order.orderNumber}<br />
-                                            סטטוס הזמנה: <StatusConvert status={order.status} /><br />
-                                            שם לקוח: {order.customerName}<br />
-                                            {order.date.replace('T', ' ')}
-                                        </div>
+                                    <div className='flex-col font-bold text-base overflow-hidden text-ellipsis'>
+                                        <h2 className='text-xl sm:text-base md:text-base'>מספר הזמנה {order.orderNumber}</h2>
+                                        <h4 className='text-base'> סטטוס הזמנה:
+                                            <span className='border-b-2 border-blue-500'>
+                                                <StatusConvert status={order.status} />
+                                            </span>
+                                        </h4>
+                                        <h4 className='text-base'>שם לקוח: {order.customerName}</h4>
+                                        <h4 className='text-base'>{order.date}</h4>
                                     </div>
 
                                     <div className='flex-1 mt-2 justify-center flex items-center'>
@@ -123,15 +127,15 @@ const Counter = ({ orders, setOrders }) => {
                 <ConfirmationModal
                     message={<span dir="rtl">לסיים את ההזמנה?</span>}
                     onConfirm={() => {
-                        // Update the status and remove the order from session storage
-                        sendMessage(finishOrderItem, 3);
+                        // Update the status and remove the order from local storage
+                        sendMessage(finishOrderItem.orderNumber, 3);  // Assuming you need to send the order number
 
                         setOrders(prevOrders => {
                             // Filter out the finished order
-                            const updatedOrders = prevOrders.filter(order => order.orderNumber !== finishOrderItem);
+                            const updatedOrders = prevOrders.filter(order => order.orderNumber !== finishOrderItem.orderNumber);
 
-                            // Update session storage
-                            sessionStorage.setItem('orders', JSON.stringify(updatedOrders));
+                            // Update local storage
+                            localStorage.setItem('orders', JSON.stringify(updatedOrders));
 
                             return updatedOrders;
                         });
@@ -141,6 +145,7 @@ const Counter = ({ orders, setOrders }) => {
                     onCancel={() => setShowConfirmation(false)}
                 />
             )}
+
 
             {showOrderDetails && selectedOrder && ( // Show the order details modal when triggered
                 <OrderDetailsModal

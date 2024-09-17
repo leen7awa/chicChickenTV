@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import StatusConvert from './StatusConvert';
 import Header from './Header';
 import OrderDetailsModal from './OrderDetailsModal'; // Import your modal component
+import './card.css';
 
 // const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
 const socket = new WebSocket('ws://localhost:8081');
@@ -24,30 +25,12 @@ const Kitchen = ({ orders, setOrders }) => {
         });
     };
 
-    // useEffect(() => {
-    //     socket.onmessage = async (event) => {
-    //         try {
-    //             let messageData;
-
-    //             const textData = await event.data.text();
-    //             messageData = JSON.parse(textData);
-
-    //             // Update the orders when a message is received from the WebSocket
-    //             setOrders(prevOrders => prevOrders.map(order =>
-    //                 order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-    //             ));
-    //         } catch (error) {
-    //             console.error("Error processing WebSocket message:", error);
-    //         }
-    //     };
-    // }, [setOrders]);
-
     useEffect(() => {
         socket.onmessage = (event) => {
             try {
                 // event.data is already a string, no need for .text()
                 const messageData = JSON.parse(event.data);
-    
+
                 // Update the orders when a message is received from the WebSocket
                 setOrders(prevOrders => prevOrders.map(order =>
                     order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
@@ -57,7 +40,7 @@ const Kitchen = ({ orders, setOrders }) => {
             }
         };
     }, [setOrders]);
-    
+
 
     // Filter orders based on the statusFilters array
     const filteredOrders = orders.filter((order) => statusFilters[order.status]);
@@ -81,26 +64,25 @@ const Kitchen = ({ orders, setOrders }) => {
                         filteredOrders.map((order, orderIndex) => (
                             <div
                                 key={orderIndex}
+                                className="order-card"
                                 style={{
                                     backgroundColor: 'wheat',
                                     border: '2px solid #1a1a1a',
                                     width: '300px',
                                     height: '200px',
+                                    // height: window.innerWidth <= 1024 ? '350px' : '200px',
                                     textAlign: 'center',
                                     borderRadius: '20px',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    overflow: 'hidden'
+                                    overflow: 'hidden',
                                 }}>
 
                                 <div className='flex flex-col h-full text-gray-800'>
-                                    <div className='flex-grow font-bold text-base overflow-hidden text-ellipsis'>
-                                        <div>
-                                            מספר הזמנה: {order.orderNumber}<br />
-                                            {/* סטטוס הזמנה: <StatusConvert status={order.status} /><br /> */}
-                                            שם לקוח: {order.customerName}<br />
-                                            {order.date.replace('T',' ')}
-                                        </div>
+                                    <div className='flex-col font-bold text-base overflow-hidden text-ellipsis'>
+                                        <h2 className='text-xl'>מספר הזמנה {order.orderNumber}</h2>
+                                        <h4 className='text-base'>שם לקוח: {order.customerName}</h4>
+                                        <h4 className='text-base'>{order.date}</h4>
                                     </div>
 
                                     <div className='flex-1 mt-2 justify-center flex items-center'>
@@ -115,7 +97,7 @@ const Kitchen = ({ orders, setOrders }) => {
                                         </button>
                                     </div>
 
-                                    <div className='flex-shrink flex justify-between items-end p-4'>
+                                    <div className='flex-shrink flex sm:flex-row md:flex-row justify-between items-end p-4'>
                                         {[{ label: 'בהמתנה', status: 0 }, { label: 'בהכנה', status: 1 }, { label: 'מוכן', status: 2 }].map((button, index) => (
                                             <button
                                                 key={index}
