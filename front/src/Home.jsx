@@ -25,11 +25,11 @@ const Home = () => {
     const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
     setOrders(storedOrders);
   }, []);
-  
+
   const handleAddOrder = (newOrder) => {
     const formatDateTime = () => {
       const today = new Date();
-      
+
       // Format date: dd/mm/yy
       const day = String(today.getDate()).padStart(2, '0');  // Get day and pad with zero if needed
       const month = String(today.getMonth() + 1).padStart(2, '0');  // Get month (January is 0, so add 1)
@@ -50,15 +50,15 @@ const Home = () => {
       date: formatDateTime(),  // Use the updated formatDateTime function
       status: 0,
     };
-    
+
     const updatedOrders = [...orders, orderWithNumber];
     setOrders(updatedOrders);
     localStorage.setItem("orders", JSON.stringify(updatedOrders)); // Using localStorage here
     setModalOpen(false); // Close the modal
-};
+  };
 
 
-  
+
 
   return (
     <>
@@ -73,6 +73,11 @@ const Home = () => {
           >
             הוספת הזמנה
           </button>
+          <button
+            className="border-2 border-gray-700 rounded-2xl bg-slate-200 h-fit px-8"
+            onClick={() => navigate("/addurl")}
+          >
+            add from url          </button>
         </div>
 
         <div className="flex-grow flex justify-center items-center">

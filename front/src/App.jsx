@@ -4,6 +4,7 @@ import Home from "./Home";
 import Kitchen from './Kitchen';
 import Restaurant from "./Restaurant";
 import Counter from "./Counter";
+import AddFromURL from "./AddFromURL";
 
 function App() {
 
@@ -61,7 +62,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* <Route path="/" element={<Home />} /> */}
+          <Route path="/addurl" element={<AddFromURL />} />
           <Route path="/kitchen" element={<Kitchen orders={orders} setOrders={setOrders} />} />
           <Route path="/restaurant" element={<Restaurant orders={orders} setOrders={setOrders} />} />
           <Route path="/counter" element={<Counter orders={orders} setOrders={setOrders} />} />
