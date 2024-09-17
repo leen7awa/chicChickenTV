@@ -14,45 +14,25 @@ function App() {
     2 - ready
     3 - finish  
   */
-  sessionStorage.clear();
+  // sessionStorage.clear();
   // Function to retrieve orders from session storage
   const getOrdersFromSessionStorage = () => {
     const savedOrders = sessionStorage.getItem('orders');
     return savedOrders ? JSON.parse(savedOrders) : [
       {
         orderNumber: 1,
-        orderItems: ['בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa','בורגר', 'פיצה', 'ציפס', 'קולה', 'דג', 'היי', 'aaa', 'bebebe','asdsa', 'aaa', 'bebebe','asdsa'],
+        customerName: 'משה',
+        orderItems: ['2 בורגר קריספי', 'קולה','עוף','סלט קיסר','סלט עוף'],
+        date: "2024-09-14T15:45:30",
+        // date: new Date().toISOString()
         status: 0,
       },
       {
         orderNumber: 2,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 1,
-      },
-      {
-        orderNumber: 78,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 2,
-      },
-      {
-        orderNumber: 3,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 2,
-      },
-      {
-        orderNumber: 4,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 3,
-      },
-      {
-        orderNumber: 5,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 1,
-      },
-      {
-        orderNumber: 6,
-        orderItems: ['salad', 'pasta', 'soup'],
-        status: 1,
+        customerName: 'לין',
+        orderItems: ['סלט', 'פסטה', '4 תפוזים'],
+        date: "2024-09-14T17:33:12",
+        status: 0,
       },
     ];
   };

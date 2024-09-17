@@ -6,8 +6,12 @@ const Header = ({ title, imageUrl, onToggleStatuses }) => {
     const [currentDate, setCurrentDate] = useState('');
     const [currentTime, setCurrentTime] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [statuses, setStatuses] = useState([true, true, true, true]); // Default to four statuses
+    // const [statuses, setStatuses] = useState([false, false, true, false]); // Default to four statuses
 
+    const [statuses, setStatuses] = useState(
+        title === 'דלפק' ? [false, false, true, false] : [true, true, true, true]
+    );
+    
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     };

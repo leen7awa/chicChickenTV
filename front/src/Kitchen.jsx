@@ -3,12 +3,13 @@ import StatusConvert from './StatusConvert';
 import Header from './Header';
 import OrderDetailsModal from './OrderDetailsModal'; // Import your modal component
 
-// const socket = new WebSocket('https://chickenserver-601a0b60e55d.herokuapp.com/');
+// const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
 const socket = new WebSocket('ws://localhost:8081');
+
 const Kitchen = ({ orders, setOrders }) => {
     const [statusFilters, setStatusFilters] = useState([true, true, true]); // Default to show all statuses
     const [showOrderDetails, setShowOrderDetails] = useState(false);
-    const [orderDetails, setOrderDetails] = useState([]);
+    const [selectedOrder, setSelectedOrder] = useState(null); // Store the selected order
 
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
@@ -23,14 +24,30 @@ const Kitchen = ({ orders, setOrders }) => {
         });
     };
 
+    // useEffect(() => {
+    //     socket.onmessage = async (event) => {
+    //         try {
+    //             let messageData;
+
+    //             const textData = await event.data.text();
+    //             messageData = JSON.parse(textData);
+
+    //             // Update the orders when a message is received from the WebSocket
+    //             setOrders(prevOrders => prevOrders.map(order =>
+    //                 order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+    //             ));
+    //         } catch (error) {
+    //             console.error("Error processing WebSocket message:", error);
+    //         }
+    //     };
+    // }, [setOrders]);
+
     useEffect(() => {
-        socket.onmessage = async (event) => {
+        socket.onmessage = (event) => {
             try {
-                let messageData;
-
-                const textData = await event.data.text();
-                messageData = JSON.parse(textData);
-
+                // event.data is already a string, no need for .text()
+                const messageData = JSON.parse(event.data);
+    
                 // Update the orders when a message is received from the WebSocket
                 setOrders(prevOrders => prevOrders.map(order =>
                     order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
@@ -40,6 +57,7 @@ const Kitchen = ({ orders, setOrders }) => {
             }
         };
     }, [setOrders]);
+    
 
     // Filter orders based on the statusFilters array
     const filteredOrders = orders.filter((order) => statusFilters[order.status]);
@@ -48,7 +66,7 @@ const Kitchen = ({ orders, setOrders }) => {
         <>
             <div className="bg-[#ffa900] h-screen overflow-y-auto">
                 <Header title='מטבח' onToggleStatuses={setStatusFilters} /> {/* Pass the toggle handler */}
-                
+
                 <div
                     style={{
                         display: 'flex',
@@ -62,25 +80,26 @@ const Kitchen = ({ orders, setOrders }) => {
                     {filteredOrders.length > 0 ? (
                         filteredOrders.map((order, orderIndex) => (
                             <div
-                            key={orderIndex}
-                            style={{
-                                backgroundColor: 'wheat',
-                                border: '2px solid #1a1a1a',
-                                width: '300px',
-                                height: '200px',
-                                textAlign: 'center',
-                                borderRadius: '20px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                overflow: 'hidden'
+                                key={orderIndex}
+                                style={{
+                                    backgroundColor: 'wheat',
+                                    border: '2px solid #1a1a1a',
+                                    width: '300px',
+                                    height: '200px',
+                                    textAlign: 'center',
+                                    borderRadius: '20px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    overflow: 'hidden'
                                 }}>
 
                                 <div className='flex flex-col h-full text-gray-800'>
-                                    <div className='flex-grow font-bold text-xl overflow-hidden text-ellipsis'>
+                                    <div className='flex-grow font-bold text-base overflow-hidden text-ellipsis'>
                                         <div>
                                             מספר הזמנה: {order.orderNumber}<br />
-                                            סטטוס הזמנה: <StatusConvert status={order.status} />
-                                            <br />שם לקוח
+                                            {/* סטטוס הזמנה: <StatusConvert status={order.status} /><br /> */}
+                                            שם לקוח: {order.customerName}<br />
+                                            {order.date.replace('T',' ')}
                                         </div>
                                     </div>
 
@@ -88,7 +107,7 @@ const Kitchen = ({ orders, setOrders }) => {
                                         <button
                                             className="px-4 py-1 bg-gray-600 font-bold rounded-2xl border-2 border-gray-800"
                                             onClick={() => {
-                                                setOrderDetails(order.orderItems); // Set order items
+                                                setSelectedOrder(order); // Set the whole order object
                                                 setShowOrderDetails(true); // Show the modal
                                             }}
                                         >
@@ -96,7 +115,7 @@ const Kitchen = ({ orders, setOrders }) => {
                                         </button>
                                     </div>
 
-                                    <div className='flex-shrink flex justify-between  items-end p-4'>
+                                    <div className='flex-shrink flex justify-between items-end p-4'>
                                         {[{ label: 'בהמתנה', status: 0 }, { label: 'בהכנה', status: 1 }, { label: 'מוכן', status: 2 }].map((button, index) => (
                                             <button
                                                 key={index}
@@ -115,9 +134,9 @@ const Kitchen = ({ orders, setOrders }) => {
                 </div>
             </div>
 
-            {showOrderDetails && ( // Show the order details modal when triggered
+            {showOrderDetails && selectedOrder && ( // Show the order details modal when triggered
                 <OrderDetailsModal
-                    items={orderDetails} // Pass the order items
+                    order={selectedOrder} // Pass the selected order object
                     onClick={() => setShowOrderDetails(false)} // Close the modal
                 />
             )}
