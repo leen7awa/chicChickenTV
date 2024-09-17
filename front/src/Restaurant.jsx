@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
-const socket = new WebSocket('https://chickenserver-601a0b60e55d.herokuapp.com/');
-
+// const socket = new WebSocket('https://chickenserver-601a0b60e55d.herokuapp.com/');
+const socket = new WebSocket('ws://localhost:8081');
 const Restaurant = ({ orders, setOrders }) => {
 
     const [status, setStatus] = useState('');
