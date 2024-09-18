@@ -11,6 +11,7 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/back/$1" },
+    { "source": "/(.*\\.(js|css|png|jpg|jpeg|svg|ico|json))", "destination": "/front/$1" },
     { "source": "/(.*)", "destination": "/front/index.html" }
   ]
 }
