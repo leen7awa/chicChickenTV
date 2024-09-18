@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 const AddFromURL = () => {
     const [status] = useState(0);
     const hasSaved = useRef(false);
-    const socket = new WebSocket('ws://localhost:8081'); // Use the same WebSocket URL
-    // const socket = new WebSocket('ws://chic-chicken-tv-c7e23c0b7496.herokuapp.com/');
+    // const socket = new WebSocket('ws://localhost:8081'); // Use the same WebSocket URL
+    const socket = new WebSocket('ws://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
     // Retrieve parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
