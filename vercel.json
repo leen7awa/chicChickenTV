@@ -12,5 +12,8 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/back/$1" },
     { "src": "/(.*)", "dest": "/front/$1" }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
