@@ -5,7 +5,7 @@ const AddFromURL = () => {
     const [status] = useState(0);
     const hasSaved = useRef(false);
     // const socket = new WebSocket('ws://localhost:8081'); // Use the same WebSocket URL
-    const socket = new WebSocket('ws://chic-chicken-oss-929342691ddb.herokuapp.com/');
+    const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
     // Retrieve parameters from URL
     const urlParams = new URLSearchParams(window.location.search);

@@ -3,7 +3,7 @@ import StatusConvert from './StatusConvert';
 import Header from './Header';
 import OrderDetailsModal from './OrderDetailsModal'; // Import your modal component
 import './card.css';
-const socket = new WebSocket('ws://chic-chicken-oss-929342691ddb.herokuapp.com/');
+const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
 // const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
 // const socket = new WebSocket('ws://localhost:8081');

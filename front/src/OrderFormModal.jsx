@@ -10,7 +10,7 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
   const hasSaved = useRef(false); // To track if the order has already been saved
   const [checkSubmit, setCheckSubmit] = useState(false);
   
-  const socket = new WebSocket('ws://chic-chicken-oss-929342691ddb.herokuapp.com/');
+  const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
   const formatDateTime = () => {
     const today = new Date();
