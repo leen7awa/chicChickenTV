@@ -9,14 +9,8 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/back/$1" },
-    { "src": "/front/(.*)", "dest": "/front/index.html" }
-  ],
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/front/index.html"
-    }
+    { "source": "/api/(.*)", "destination": "/back/$1" },
+    { "source": "/(.*)", "destination": "/front/index.html" }
   ]
 }
