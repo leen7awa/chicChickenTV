@@ -5,7 +5,7 @@ import RestaurantHeader from "./RestaurantHeader";
 // const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
 // const socket = new WebSocket('ws://localhost:8081');
 // const socket = new WebSocket('ws://chic-chicken-tv-c7e23c0b7496.herokuapp.com/');
-const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+    const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
 const Restaurant = ({ orders, setOrders }) => {
 
