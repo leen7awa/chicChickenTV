@@ -3,11 +3,9 @@ import StatusConvert from './StatusConvert';
 import Header from './Header';
 import OrderDetailsModal from './OrderDetailsModal'; // Import your modal component
 import './card.css';
-const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
-// const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
-// const socket = new WebSocket('ws://localhost:8081');
-// const socket = new WebSocket('ws://chic-chicken-tv-c7e23c0b7496.herokuapp.com/');
+// Initialize WebSocket connection
+const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
 const Kitchen = ({ orders, setOrders }) => {
     const [statusFilters, setStatusFilters] = useState([true, true, true]); // Default to show all statuses
@@ -28,9 +26,9 @@ const Kitchen = ({ orders, setOrders }) => {
     };
 
     useEffect(() => {
+        // WebSocket message handler
         socket.onmessage = (event) => {
             if (event.data instanceof Blob) {
-                // Handle Blob data
                 const reader = new FileReader();
                 reader.onload = () => {
                     try {
@@ -51,11 +49,16 @@ const Kitchen = ({ orders, setOrders }) => {
                 }
             }
         };
-    
+
+        // WebSocket error handling
+        socket.onerror = (error) => {
+            console.error('WebSocket Error: ', error);
+        };
+
         const handleMessage = (messageData) => {
             setOrders(prevOrders => {
                 const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
-    
+
                 if (orderExists) {
                     // Update the order if it already exists
                     return prevOrders.map(order =>
@@ -67,7 +70,6 @@ const Kitchen = ({ orders, setOrders }) => {
                 }
             });
         };
-    
     }, [setOrders]);
 
     // Filter orders based on the statusFilters array
@@ -98,7 +100,6 @@ const Kitchen = ({ orders, setOrders }) => {
                                     border: '2px solid #1a1a1a',
                                     width: '300px',
                                     height: '200px',
-                                    // height: window.innerWidth <= 1024 ? '350px' : '200px',
                                     textAlign: 'center',
                                     borderRadius: '20px',
                                     display: 'flex',

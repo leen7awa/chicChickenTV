@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-// import './windowMsg.css';
 import './modal.css';
 
 const OrderFormModal = ({ onClose, onSubmit }) => {
   const [customerName, setCustomerName] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
   const [orderItems, setOrderItems] = useState('');
-  // const socket = new WebSocket('ws://localhost:8081'); // WebSocket connection
   const hasSaved = useRef(false); // To track if the order has already been saved
   const [checkSubmit, setCheckSubmit] = useState(false);
   
   const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
+  // Function to format the current date and time
   const formatDateTime = () => {
     const today = new Date();
     const day = String(today.getDate()).padStart(2, '0');
@@ -23,66 +22,59 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
     return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   };
 
+  // Handle form submission
   const handleSubmit = () => {
-    if (checkSubmit) {
-      if (!customerName || !orderNumber || !orderItems) {
-        alert("Please fill all the fields.");
-        return false;
-      }
-      else {
-        const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
-        const isOrderNumberExists = existingOrders.some(order => order.orderNumber === orderNumber);
-
-        if (isOrderNumberExists) {
-          alert(`Order number ${orderNumber} already exists.`);
-          return false;
-        }
-
-        const itemsArray = orderItems.split(',');
-        const newOrder = {
-          orderNumber,
-          customerName,
-          orderItems: itemsArray,
-          date: formatDateTime(),
-          status: 0,
-        };
-
-        onSubmit(newOrder);
-        setCheckSubmit(false);
-      }
+    if (!customerName || !orderNumber || !orderItems) {
+      alert("Please fill all the fields.");
+      return;
     }
+    const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
+    const isOrderNumberExists = existingOrders.some(order => order.orderNumber === orderNumber);
+
+    if (isOrderNumberExists) {
+      alert(`Order number ${orderNumber} already exists.`);
+      return;
+    }
+
+    const itemsArray = orderItems.split(',');
+    const newOrder = {
+      orderNumber,
+      customerName,
+      orderItems: itemsArray,
+      date: formatDateTime(),
+      status: 0, // Initial status
+    };
+
+    onSubmit(newOrder);
+    saveOrder(newOrder);
+    setCheckSubmit(false);
+  };
+
+  // Function to save the order and send it via WebSocket
+  const saveOrder = (newOrder) => {
+    const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
+    const updatedOrders = [...existingOrders, newOrder];
+    localStorage.setItem('orders', JSON.stringify(updatedOrders));
+
+    // Emit WebSocket message to inform other components
+    socket.onopen = () => {
+      socket.send(JSON.stringify(newOrder));
+    };
+
+    socket.onerror = (error) => {
+      console.error('WebSocket Error: ', error);
+    };
+
+    hasSaved.current = true;
   };
 
   useEffect(() => {
     if (checkSubmit) {
       if (!hasSaved.current && orderNumber && customerName && orderItems) {
-        const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
-        const isOrderNumberExists = existingOrders.some(order => order.orderNumber === orderNumber);
-
-        if (!isOrderNumberExists) {
-          const newOrder = {
-            orderNumber,
-            customerName,
-            orderItems: orderItems.split(','),
-            date: formatDateTime(),
-            status: 0,
-          };
-
-          const updatedOrders = [...existingOrders, newOrder];
-          localStorage.setItem('orders', JSON.stringify(updatedOrders));
-
-          // Emit WebSocket message to inform other components
-          socket.onopen = () => {
-            socket.send(JSON.stringify(newOrder));
-          };
-
-          hasSaved.current = true;
-        } else {
-          console.log(`Order with orderNumber ${orderNumber} already exists.`);
-        }
+        handleSubmit();
       }
     }
-  }, [orderNumber, customerName, orderItems, socket]);
+  }, [checkSubmit, orderNumber, customerName, orderItems]);
 
   return (
     <div className="modal-overlay">
@@ -122,11 +114,7 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
         <div className="flex justify-between mt-4">
           <button
             className="bg-green-500 text-white px-4 py-2 rounded"
-            onClick={() => {
-              setCheckSubmit(true)
-              handleSubmit
-            }
-            }
+            onClick={() => setCheckSubmit(true)}
           >
             שמור
           </button>

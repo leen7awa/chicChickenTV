@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from "react";
-// import Header from "./Header";
 import RestaurantHeader from "./RestaurantHeader";
 
-// const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
-// const socket = new WebSocket('ws://localhost:8081');
-// const socket = new WebSocket('ws://chic-chicken-tv-c7e23c0b7496.herokuapp.com/');
-    const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+// Initialize WebSocket connection
+const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
 const Restaurant = ({ orders, setOrders }) => {
-
-    const [status, setStatus] = useState('');
-
     const [readyOrders, setReadyOrders] = useState([]);
     const [preppingOrders, setPreppingOrders] = useState([]);
 
@@ -38,7 +32,12 @@ const Restaurant = ({ orders, setOrders }) => {
                 }
             }
         };
-    
+
+        // WebSocket error handling
+        socket.onerror = (error) => {
+            console.error('WebSocket Error: ', error);
+        };
+
         const updateOrders = (messageData) => {
             // Update the orders when a message is received from the WebSocket
             setOrders(prevOrders =>
@@ -50,8 +49,8 @@ const Restaurant = ({ orders, setOrders }) => {
             );
         };
     }, [setOrders]);
-    
 
+    // Filter orders based on their status
     useEffect(() => {
         const filteredPreppingOrders = orders.filter(order => order.status === 1);
         const filteredReadyOrders = orders.filter(order => order.status === 2);
@@ -80,11 +79,12 @@ const Restaurant = ({ orders, setOrders }) => {
 
     return (
         <>
-            {/* top section */}
-                <RestaurantHeader/>
+            {/* Top section */}
+            <RestaurantHeader />
+            
             <div className="flex h-screen text-center text-4xl font-bold bg-yellow-100">
+                {/* Prepping Orders Section */}
                 <div className="flex-1">
-                    {/* <h2>הזמנות בהכנה</h2> */}
                     <div className="flex-row p-4 font-normal text-2xl">
                         {preppingOrders.map(order => (
                             <div
@@ -98,7 +98,7 @@ const Restaurant = ({ orders, setOrders }) => {
                     </div>
                 </div>
 
-                {/* middle section */}
+                {/* Image Carousel Section */}
                 <div className="flex-grow flex w-32 justify-center items-center">
                     <div className="w-full h-full flex justify-center items-center">
                         <img
@@ -109,18 +109,17 @@ const Restaurant = ({ orders, setOrders }) => {
                     </div>
                 </div>
 
-                {/* bottom section */}
+                {/* Ready Orders Section */}
                 <div className="flex-1">
-                    {/* <h2>הזמנות מוכנות</h2> */}
                     <div className="flex-row gap-4 p-4 font-bold text-2xl">
                         {readyOrders.map(order => (
                             <div
-                            key={order.orderNumber}
-                            className="border-black border-b-2 p-2 justify justify-between flex"
-                        >
-                            <div className="font-bold text-3xl">{order.orderNumber}</div>
-                            <div className="font-bold text-3xl">{order.customerName}</div>
-                        </div>
+                                key={order.orderNumber}
+                                className="border-black border-b-2 p-2 justify justify-between flex"
+                            >
+                                <div className="font-bold text-3xl">{order.orderNumber}</div>
+                                <div className="font-bold text-3xl">{order.customerName}</div>
+                            </div>
                         ))}
                     </div>
                 </div>
