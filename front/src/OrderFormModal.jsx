@@ -3,11 +3,13 @@ import './windowMsg.css';
 
 const OrderFormModal = ({ onClose, onSubmit }) => {
   const [customerName, setCustomerName] = useState('');
+  const [orderNumber, setOrderNumber] = useState('');
   const [orderItems, setOrderItems] = useState('');
-  
+
   const handleSubmit = () => {
     const itemsArray = orderItems.split(',').map(item => item.trim());
     onSubmit({
+      orderNumber,
       customerName,
       orderItems: itemsArray,
     });
@@ -17,13 +19,22 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
     <div className="modal-overlay">
       <div className="flex flex-col text-sm modal-content space-y-2 bg-[#fff2cd] border-2 border-gray-800 p-4">
         <h4>הוסף הזמנה חדשה</h4>
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-2 text-end">
           <label>
-            שם לקוח:
+            מספר הזמנה
             <input
               type="text"
               className="border w-full p-2"
-              // customerName = 'khkh'
+              value={orderNumber}
+              onChange={(e) => setOrderNumber(e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            שם לקוח
+            <input
+              type="text"
+              className="border w-full p-2"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
             />
@@ -32,7 +43,7 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
             פריטי הזמנה (מופרדים בפסיקים):
             <input
               type="text"
-              className="border w-full p-2"
+              className="border w-full p-2 text-end"
               value={orderItems}
               onChange={(e) => setOrderItems(e.target.value)}
               placeholder="לדוגמה: בורגר, צ'יפס, קולה"

@@ -25,21 +25,50 @@ const Kitchen = ({ orders, setOrders }) => {
         });
     };
 
+    // useEffect(() => {
+    //     socket.onmessage = (event) => {
+    //         try {
+    //             const messageData = JSON.parse(event.data);
+    
+    //             // If the message is a new order, add it to the orders list
+    //             if (messageData.orderNumber) {
+    //                 setOrders(prevOrders => [...prevOrders, messageData]);
+    //             } else {
+    //                 // Update the orders when a message is received for status changes
+    //                 setOrders(prevOrders => prevOrders.map(order =>
+    //                     order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+    //                 ));
+    //             }
+    //         } catch (error) {
+    //             console.error("Error processing WebSocket message:", error);
+    //         }
+    //     };
+    // }, [setOrders]);
     useEffect(() => {
         socket.onmessage = (event) => {
             try {
-                // event.data is already a string, no need for .text()
                 const messageData = JSON.parse(event.data);
-
-                // Update the orders when a message is received from the WebSocket
-                setOrders(prevOrders => prevOrders.map(order =>
-                    order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                ));
+    
+                setOrders(prevOrders => {
+                    const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
+    
+                    if (orderExists) {
+                        // Update the order if it already exists
+                        return prevOrders.map(order =>
+                            order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                        );
+                    } else {
+                        // Add the new order if it doesn't exist
+                        return [...prevOrders, messageData];
+                    }
+                });
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
             }
         };
     }, [setOrders]);
+    
+    
 
 
     // Filter orders based on the statusFilters array

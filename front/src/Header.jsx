@@ -11,7 +11,7 @@ const Header = ({ title, imageUrl, onToggleStatuses }) => {
     const [statuses, setStatuses] = useState(
         title === 'דלפק' ? [false, false, true, false] : [true, true, true, true]
     );
-    
+
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
     };
@@ -51,12 +51,21 @@ const Header = ({ title, imageUrl, onToggleStatuses }) => {
         onToggleStatuses(updatedStatuses); // Pass updated statuses to the parent component
     };
 
-    const statusLabels = title === 'דלפק' 
-        ? ['בהמתנה', 'בהכנה', 'מוכן'] 
+    const statusLabels = title === 'דלפק'
+        ? ['בהמתנה', 'בהכנה', 'מוכן']
         : ['בהמתנה', 'בהכנה', 'מוכן']; // Conditionally select statuses
 
     return (
         <nav className="flex bg-gray-800 text-[#ffa900] max-h-44 p-4 justify-between">
+
+            <button
+                onClick={() => {
+                    localStorage.clear();
+                    localStorage.removeItem('orders');
+                }}>
+                clear local storage
+            </button>
+
             <div className="flex-1">
                 {!imageUrl && (
                     <div className="justify-start w-fit mx-auto text-center">

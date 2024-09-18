@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import CounterIcon from "../icons/CounterIcon";
 import KitchenIcon from "../icons/KitchenIcon";
@@ -6,13 +6,13 @@ import RestaurantIcon from "../icons/RestaurantIcon";
 import Header from "./Header";
 import './Home.css';
 import OrderFormModal from "./OrderFormModal"; // Import the modal component
-import AddFromURL from "./AddFromURL";
 
 const Home = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [orders, setOrders] = useState([]);
+  const socketRef = useRef(null); // Use ref to store the WebSocket instance
 
   useEffect(() => {
     const today = new Date();
@@ -25,40 +25,70 @@ const Home = () => {
     const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
     setOrders(storedOrders);
   }, []);
+  
+  // const socket = new WebSocket('ws://localhost:8081');
 
+  useEffect(() => {
+    socketRef.current = new WebSocket('ws://localhost:8081');
+
+    // socketRef.current.onopen = () => {
+    //   console.log("Connected to WebSocket server");
+    // };
+
+    socketRef.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    // socketRef.current.onclose = () => {
+    //   console.log("WebSocket connection closed");
+    // };
+
+    // Cleanup on component unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
+  }, []);
+
+  // Handle adding a new order
   const handleAddOrder = (newOrder) => {
     const formatDateTime = () => {
       const today = new Date();
 
       // Format date: dd/mm/yy
-      const day = String(today.getDate()).padStart(2, '0');  // Get day and pad with zero if needed
-      const month = String(today.getMonth() + 1).padStart(2, '0');  // Get month (January is 0, so add 1)
-      const year = String(today.getFullYear()).slice(-2);  // Get last 2 digits of the year
+      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const year = String(today.getFullYear()).slice(-2);
 
       // Format time: HH:mm:ss
-      const hours = String(today.getHours()).padStart(2, '0');  // Get hours and pad with zero if needed
-      const minutes = String(today.getMinutes()).padStart(2, '0');  // Get minutes and pad with zero if needed
-      const seconds = String(today.getSeconds()).padStart(2, '0');  // Get seconds and pad with zero if needed
+      const hours = String(today.getHours()).padStart(2, '0');
+      const minutes = String(today.getMinutes()).padStart(2, '0');
+      const seconds = String(today.getSeconds()).padStart(2, '0');
 
-      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;  // Combine date and time
+      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     };
 
-    // const orderNumber = orders.length + 1;
     const orderWithNumber = {
       ...newOrder,
-      // orderNumber,
-      date: formatDateTime(),  // Use the updated formatDateTime function
+      date: formatDateTime(),
       status: 0,
     };
 
     const updatedOrders = [...orders, orderWithNumber];
     setOrders(updatedOrders);
-    localStorage.setItem("orders", JSON.stringify(updatedOrders)); // Using localStorage here
+    localStorage.setItem("orders", JSON.stringify(updatedOrders));
     setModalOpen(false); // Close the modal
+
+    // Send the new order to the WebSocket server if connection is open
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      const message = JSON.stringify(orderWithNumber);
+      socketRef.current.send(message);
+      console.log("Order sent via WebSocket:", message);
+    } else {
+      console.error("WebSocket is not open. Cannot send message.");
+    }
   };
-
-
-
 
   return (
     <>
@@ -66,7 +96,7 @@ const Home = () => {
         <Header imageUrl="/icon.png" />
 
         {/* Button to open modal */}
-        <div className="flex flex-1 w-fit mx-auto mt-8">
+        <div className="flex flex-1 w-fit ml-[550px] mt-8">
           <button
             className="border-2 border-gray-700 rounded-2xl bg-slate-200 h-fit px-8"
             onClick={() => setModalOpen(true)}
@@ -75,9 +105,9 @@ const Home = () => {
           </button>
           <button
             className="border-2 border-gray-700 rounded-2xl bg-slate-200 h-fit px-8"
-            onClick={() => navigate(`/addurl?orderNumber=10&customerName=גוני&orderItems=פיצה,בורגר,סלט`)}
+            onClick={() => navigate(`/addurl?orderNumber=1&customerName=גוני&orderItems=פיצה,בורגר,סלט`)}
           >
-            add from url
+            Add from URL
           </button>
         </div>
 

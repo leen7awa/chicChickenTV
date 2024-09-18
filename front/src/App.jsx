@@ -15,8 +15,8 @@ function App() {
     2 - ready
     3 - finish  
   */
-  // localStorage.clear(); // Use this only if you want to clear orders manually during development
-
+  // localStorage.clear();
+  // localStorage.removeItem('orders');
   // Function to retrieve orders from local storage
   const getOrdersFromLocalStorage = () => {
     const savedOrders = localStorage.getItem('orders');

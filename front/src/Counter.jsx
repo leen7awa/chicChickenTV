@@ -29,21 +29,45 @@ const Counter = ({ orders, setOrders }) => {
         });
     };
 
+    // useEffect(() => {
+    //     socket.onmessage = (event) => {
+    //         try {
+    //             // event.data is already a string, no need for .text()
+    //             const messageData = JSON.parse(event.data);
+
+    //             // Update the orders when a message is received from the WebSocket
+    //             setOrders(prevOrders => prevOrders.map(order =>
+    //                 order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+    //             ));
+    //         } catch (error) {
+    //             console.error("Error processing WebSocket message:", error);
+    //         }
+    //     };
+    // }, [setOrders]);
     useEffect(() => {
         socket.onmessage = (event) => {
             try {
-                // event.data is already a string, no need for .text()
                 const messageData = JSON.parse(event.data);
-
-                // Update the orders when a message is received from the WebSocket
-                setOrders(prevOrders => prevOrders.map(order =>
-                    order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                ));
+    
+                setOrders(prevOrders => {
+                    const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
+    
+                    if (orderExists) {
+                        // Update the order if it already exists
+                        return prevOrders.map(order =>
+                            order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                        );
+                    } else {
+                        // Add the new order if it doesn't exist
+                        return [...prevOrders, messageData];
+                    }
+                });
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
             }
         };
     }, [setOrders]);
+
 
     // Filter orders to include only those with status < 3
     const filteredOrders = orders.filter((order) => statusFilters[order.status]);
@@ -127,24 +151,26 @@ const Counter = ({ orders, setOrders }) => {
                 <ConfirmationModal
                     message={<span dir="rtl">לסיים את ההזמנה?</span>}
                     onConfirm={() => {
-                        // Update the status and remove the order from local storage
-                        sendMessage(finishOrderItem.orderNumber, 3);  // Assuming you need to send the order number
-
+                        // sendMessage(finishOrderItem,3);
+                        // Remove the order from the list and update local storage
                         setOrders(prevOrders => {
                             // Filter out the finished order
                             const updatedOrders = prevOrders.filter(order => order.orderNumber !== finishOrderItem.orderNumber);
 
-                            // Update local storage
+                            // Update local storage to reflect the deletion
                             localStorage.setItem('orders', JSON.stringify(updatedOrders));
 
                             return updatedOrders;
                         });
 
+                        // Close the confirmation modal
                         setShowConfirmation(false);
                     }}
                     onCancel={() => setShowConfirmation(false)}
                 />
             )}
+
+
 
 
             {showOrderDetails && selectedOrder && ( // Show the order details modal when triggered
