@@ -58,18 +58,19 @@ const Header = ({ title, imageUrl, onToggleStatuses }) => {
     return (
         <nav className="flex bg-gray-800 text-[#ffa900] max-h-44 p-4 justify-between">
 
-            <button
+            {/* <button
                 onClick={() => {
                     localStorage.clear();
                     localStorage.removeItem('orders');
                 }}>
                 clear local storage
-            </button>
+            </button> */}
 
             <div className="flex-1">
                 {!imageUrl && (
                     <div className="justify-start w-fit mx-auto text-center">
                         <div className="flex flex-col items-start justify-between">
+                            {/* <img src="/icon.png" alt="" /> */}
                             <button className="text-base mt-2" onClick={toggleDropdown}>
                                 <FilterIcon />
                             </button>

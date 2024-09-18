@@ -7,6 +7,7 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
   const [orderItems, setOrderItems] = useState('');
   const socket = new WebSocket('ws://localhost:8081'); // WebSocket connection
   const hasSaved = useRef(false); // To track if the order has already been saved
+  const [checkSubmit, setCheckSubmit] = useState(false);
 
   const formatDateTime = () => {
     const today = new Date();
@@ -20,49 +21,62 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    if (!customerName || !orderNumber || !orderItems) {
-      alert("Please fill all the fields.");
-      return false;
-    }
-    else {
-      const itemsArray = orderItems.split(',');
-      const newOrder = {
-        orderNumber,
-        customerName,
-        orderItems: itemsArray,
-        date: formatDateTime(),
-        status: 0,
-      };
-      onSubmit(newOrder);
-    }
-  };
+    if (checkSubmit) {
+      if (!customerName || !orderNumber || !orderItems) {
+        alert("Please fill all the fields.");
+        return false;
+      }
+      else {
+        const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
+        const isOrderNumberExists = existingOrders.some(order => order.orderNumber === orderNumber);
 
-  // This useEffect will handle sending the message via WebSocket and saving to local storage
-  useEffect(() => {
-    if (!hasSaved.current && orderNumber && customerName && orderItems) {
-      const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
-      const isOrderNumberExists = existingOrders.some(order => order.orderNumber === orderNumber);
+        if (isOrderNumberExists) {
+          alert(`Order number ${orderNumber} already exists.`);
+          return false;
+        }
 
-      if (!isOrderNumberExists) {
+        const itemsArray = orderItems.split(',');
         const newOrder = {
           orderNumber,
           customerName,
-          orderItems: orderItems.split(','),
+          orderItems: itemsArray,
           date: formatDateTime(),
           status: 0,
         };
 
-        const updatedOrders = [...existingOrders, newOrder];
-        localStorage.setItem('orders', JSON.stringify(updatedOrders));
+        onSubmit(newOrder);
+        setCheckSubmit(false);
+      }
+    }
+  };
 
-        // Emit WebSocket message to inform other components
-        socket.onopen = () => {
-          socket.send(JSON.stringify(newOrder));
-        };
+  useEffect(() => {
+    if (checkSubmit) {
+      if (!hasSaved.current && orderNumber && customerName && orderItems) {
+        const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
+        const isOrderNumberExists = existingOrders.some(order => order.orderNumber === orderNumber);
 
-        hasSaved.current = true;
-      } else {
-        console.log(`Order with orderNumber ${orderNumber} already exists.`);
+        if (!isOrderNumberExists) {
+          const newOrder = {
+            orderNumber,
+            customerName,
+            orderItems: orderItems.split(','),
+            date: formatDateTime(),
+            status: 0,
+          };
+
+          const updatedOrders = [...existingOrders, newOrder];
+          localStorage.setItem('orders', JSON.stringify(updatedOrders));
+
+          // Emit WebSocket message to inform other components
+          socket.onopen = () => {
+            socket.send(JSON.stringify(newOrder));
+          };
+
+          hasSaved.current = true;
+        } else {
+          console.log(`Order with orderNumber ${orderNumber} already exists.`);
+        }
       }
     }
   }, [orderNumber, customerName, orderItems, socket]);
@@ -105,7 +119,11 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
         <div className="flex justify-between mt-4">
           <button
             className="bg-green-500 text-white px-4 py-2 rounded"
-            onClick={handleSubmit}
+            onClick={() => {
+              setCheckSubmit(true)
+              handleSubmit
+            }
+            }
           >
             שמור
           </button>
