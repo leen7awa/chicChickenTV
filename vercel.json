@@ -9,7 +9,7 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
+  "rewrites": [
     { "source": "/api/(.*)", "destination": "/back/$1" },
     { "source": "/(.*)", "destination": "/front/$1" }
   ]
