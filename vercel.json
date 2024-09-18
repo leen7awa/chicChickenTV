@@ -5,15 +5,18 @@
       "use": "@vercel/static-build"
     },
     {
-      "src": "back/server.js", 
+      "src": "back/server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/back/$1" },
-    { "src": "/(.*)", "dest": "/front/$1" }
+    { "src": "/front/(.*)", "dest": "/front/index.html" }
   ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/(.*)",
+      "destination": "/front/index.html"
+    }
   ]
 }
