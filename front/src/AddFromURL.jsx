@@ -47,12 +47,14 @@ const AddFromURL = () => {
     }, [orderNumber, customerName, orderItems, status]);
 
     return (
-        <div>
-            {/* <p>Order Number: {orderNumber}</p>
-            <p>Customer Name: {customerName}</p>
-            <p>Order Items: {orderItems}</p>
-            <p>Date and Time: {currentDate}</p>
-            <p>Order Status: {status}</p> */}
+        <div className='bg-slate-300 justify justify-center'>
+            <div className='container text-center'>
+                <p>Order Number: {orderNumber}</p>
+                <p>Customer Name: {customerName}</p>
+                <p>Order Items: {orderItems}</p>
+                <p>Date and Time: {currentDate}</p>
+                {/* <p>Order Status: {status}</p> */}
+            </div>
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState,useEffect,useRef } from "react";
 import './windowMsg.css';
 
 const OrderFormModal = ({ onClose, onSubmit }) => {
@@ -20,22 +20,17 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    if (!customerName || !orderNumber || !orderItems) {
-      alert("Please fill all the fields.");
-      return false;
-    }
-    else {
-      const itemsArray = orderItems.split(',');
-      const newOrder = {
-        orderNumber,
-        customerName,
-        orderItems: itemsArray,
-        date: formatDateTime(),
-        status: 0,
-      };
-      onSubmit(newOrder);
-    }
+    const itemsArray = orderItems.split(',');
+    const newOrder = {
+      orderNumber,
+      customerName,
+      orderItems: itemsArray,
+      date: formatDateTime(),
+      status: 0,
+    };
+    onSubmit(newOrder);
   };
+
 
   // This useEffect will handle sending the message via WebSocket and saving to local storage
   useEffect(() => {
@@ -67,6 +62,8 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
     }
   }, [orderNumber, customerName, orderItems, socket]);
 
+
+  
   return (
     <div className="modal-overlay">
       <div className="flex flex-col text-sm modal-content space-y-2 bg-[#fff2cd] border-2 border-gray-800 p-4">

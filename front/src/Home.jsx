@@ -47,8 +47,8 @@ const Home = () => {
     const orderWithNumber = {
       ...newOrder,
       // orderNumber,
-      date: formatDateTime(),  // Use the updated formatDateTime function
-      status: 0,
+      // date: formatDateTime(),  // Use the updated formatDateTime function
+      // status: 0,
     };
 
     const updatedOrders = [...orders, orderWithNumber];
@@ -75,7 +75,7 @@ const Home = () => {
           </button>
           <button
             className="border-2 border-gray-700 rounded-2xl bg-slate-200 h-fit px-8"
-            onClick={() => navigate(`/addurl?orderNumber=10&customerName=גוני&orderItems=פיצה,בורגר,סלט`)}
+            onClick={() => navigate(`/addurl?orderNumber=11&customerName=גוני&orderItems=פיצה,בורגר,סלט`)}
           >
             add from url
           </button>
