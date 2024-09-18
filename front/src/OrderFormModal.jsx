@@ -5,10 +5,10 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
   const [customerName, setCustomerName] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
   const [orderItems, setOrderItems] = useState('');
-  // const socket = new WebSocket('ws://localhost:8081'); // WebSocket connection
+  const socket = new WebSocket('ws://localhost:8081'); // WebSocket connection
   const hasSaved = useRef(false); // To track if the order has already been saved
   const [checkSubmit, setCheckSubmit] = useState(false);
-  const socket = new WebSocket('ws://chic-chicken-tv-c7e23c0b7496.herokuapp.com/');
+  // const socket = new WebSocket('ws://chic-chicken-tv-c7e23c0b7496.herokuapp.com/');
   const formatDateTime = () => {
     const today = new Date();
     const day = String(today.getDate()).padStart(2, '0');
