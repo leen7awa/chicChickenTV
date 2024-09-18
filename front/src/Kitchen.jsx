@@ -12,6 +12,7 @@ const Kitchen = ({ orders, setOrders }) => {
     const [showOrderDetails, setShowOrderDetails] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null); // Store the selected order
 
+    // Function to send WebSocket messages
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
         socket.send(message); // Send order number and new status to WebSocket
