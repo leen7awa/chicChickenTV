@@ -1,5 +1,16 @@
 {
-    "rewrites": [
-      { "source": "/(.*)", "destination": "/" }
-    ]
-  }
+  "builds": [
+    {
+      "src": "front/package.json",
+      "use": "@vercel/static-build"
+    },
+    {
+      "src": "back/server.js", 
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/back/$1" },
+    { "src": "/(.*)", "dest": "/front/$1" }
+  ]
+}
