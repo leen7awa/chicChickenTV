@@ -15,6 +15,22 @@
       "destination": "/back/$1"
     },
     {
+      "source": "/(.*).js",
+      "destination": "/front/$1.js"
+    },
+    {
+      "source": "/(.*).css",
+      "destination": "/front/$1.css"
+    },
+    {
+      "source": "/(.*).png",
+      "destination": "/front/$1.png"
+    },
+    {
+      "source": "/(.*).jpg",
+      "destination": "/front/$1.jpg"
+    },
+    {
       "source": "/(.*)",
       "destination": "/front/index.html"
     }
