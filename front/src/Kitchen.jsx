@@ -27,51 +27,48 @@ const Kitchen = ({ orders, setOrders }) => {
         });
     };
 
-    // useEffect(() => {
-    //     socket.onmessage = (event) => {
-    //         try {
-    //             const messageData = JSON.parse(event.data);
-    
-    //             // If the message is a new order, add it to the orders list
-    //             if (messageData.orderNumber) {
-    //                 setOrders(prevOrders => [...prevOrders, messageData]);
-    //             } else {
-    //                 // Update the orders when a message is received for status changes
-    //                 setOrders(prevOrders => prevOrders.map(order =>
-    //                     order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-    //                 ));
-    //             }
-    //         } catch (error) {
-    //             console.error("Error processing WebSocket message:", error);
-    //         }
-    //     };
-    // }, [setOrders]);
     useEffect(() => {
         socket.onmessage = (event) => {
-            try {
-                const messageData = JSON.parse(event.data);
-    
-                setOrders(prevOrders => {
-                    const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
-    
-                    if (orderExists) {
-                        // Update the order if it already exists
-                        return prevOrders.map(order =>
-                            order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                        );
-                    } else {
-                        // Add the new order if it doesn't exist
-                        return [...prevOrders, messageData];
+            if (event.data instanceof Blob) {
+                // Handle Blob data
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const messageData = JSON.parse(reader.result); // Assuming the blob contains JSON data
+                        handleMessage(messageData);
+                    } catch (error) {
+                        console.error("Error processing Blob WebSocket message:", error);
                     }
-                });
-            } catch (error) {
-                console.error("Error processing WebSocket message:", error);
+                };
+                reader.readAsText(event.data);
+            } else {
+                // Handle JSON data
+                try {
+                    const messageData = JSON.parse(event.data);
+                    handleMessage(messageData);
+                } catch (error) {
+                    console.error("Error processing WebSocket message:", error);
+                }
             }
         };
+    
+        const handleMessage = (messageData) => {
+            setOrders(prevOrders => {
+                const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
+    
+                if (orderExists) {
+                    // Update the order if it already exists
+                    return prevOrders.map(order =>
+                        order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                    );
+                } else {
+                    // Add the new order if it doesn't exist
+                    return [...prevOrders, messageData];
+                }
+            });
+        };
+    
     }, [setOrders]);
-    
-    
-
 
     // Filter orders based on the statusFilters array
     const filteredOrders = orders.filter((order) => statusFilters[order.status]);

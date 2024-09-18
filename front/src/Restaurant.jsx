@@ -16,19 +16,41 @@ const Restaurant = ({ orders, setOrders }) => {
 
     useEffect(() => {
         socket.onmessage = (event) => {
-            try {
-                // event.data is already a string, no need for .text()
-                const messageData = JSON.parse(event.data);
-    
-                // Update the orders when a message is received from the WebSocket
-                setOrders(prevOrders => prevOrders.map(order =>
-                    order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                ));
-            } catch (error) {
-                console.error("Error processing WebSocket message:", error);
+            if (event.data instanceof Blob) {
+                // Handle Blob data
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const messageData = JSON.parse(reader.result); // Assuming Blob contains JSON data
+                        updateOrders(messageData);
+                    } catch (error) {
+                        console.error("Error processing Blob WebSocket message:", error);
+                    }
+                };
+                reader.readAsText(event.data);
+            } else {
+                // Handle JSON string data
+                try {
+                    const messageData = JSON.parse(event.data);
+                    updateOrders(messageData);
+                } catch (error) {
+                    console.error("Error processing WebSocket message:", error);
+                }
             }
         };
+    
+        const updateOrders = (messageData) => {
+            // Update the orders when a message is received from the WebSocket
+            setOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order.orderNumber === messageData.orderNumber
+                        ? { ...order, status: messageData.status }
+                        : order
+                )
+            );
+        };
     }, [setOrders]);
+    
 
     useEffect(() => {
         const filteredPreppingOrders = orders.filter(order => order.status === 1);
