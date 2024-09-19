@@ -2,12 +2,29 @@ import React, { useState, useEffect } from "react";
 import RestaurantHeader from "./RestaurantHeader";
 
 // Initialize WebSocket connection
-const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+const socket = new WebSocket('ws://localhost:8081/');
 
-const Restaurant = ({ orders, setOrders }) => {
+const Restaurant = () => {
+    const [orders, setOrders] = useState([]); // State to store orders from the database
     const [readyOrders, setReadyOrders] = useState([]);
     const [preppingOrders, setPreppingOrders] = useState([]);
 
+    // Fetch orders from the backend when the component mounts
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch('http://localhost:8081/orders'); // Replace with your backend URL
+                const data = await response.json();
+                setOrders(data); // Set orders fetched from the backend
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        };
+
+        fetchOrders();
+    }, []);
+
+    // WebSocket message handling for real-time updates
     useEffect(() => {
         socket.onmessage = (event) => {
             if (event.data instanceof Blob) {
@@ -48,7 +65,7 @@ const Restaurant = ({ orders, setOrders }) => {
                 )
             );
         };
-    }, [setOrders]);
+    }, []);
 
     // Filter orders based on their status
     useEffect(() => {
@@ -69,6 +86,7 @@ const Restaurant = ({ orders, setOrders }) => {
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+    // Image carousel effect
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
