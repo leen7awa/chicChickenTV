@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import RestaurantHeader from "./RestaurantHeader";
 
-// Initialize WebSocket connection
-// const socket = new WebSocket('ws://localhost:8081/');
-const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 const Restaurant = () => {
     const [orders, setOrders] = useState([]); // State to store orders from the database
     const [readyOrders, setReadyOrders] = useState([]);
     const [preppingOrders, setPreppingOrders] = useState([]);
+    const [images] = useState([
+        "image1.jpg",
+        "image2.jpg",
+        "image3.jpg",
+        "image4.jpg",
+        "image5.jpg"
+    ]);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     // Fetch orders from the backend when the component mounts
     useEffect(() => {
@@ -24,15 +29,16 @@ const Restaurant = () => {
         fetchOrders();
     }, []);
 
-    // WebSocket message handling for real-time updates
+    // WebSocket handling for real-time updates
     useEffect(() => {
+        const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+
         socket.onmessage = (event) => {
             if (event.data instanceof Blob) {
-                // Handle Blob data
                 const reader = new FileReader();
                 reader.onload = () => {
                     try {
-                        const messageData = JSON.parse(reader.result); // Assuming Blob contains JSON data
+                        const messageData = JSON.parse(reader.result);
                         updateOrders(messageData);
                     } catch (error) {
                         console.error("Error processing Blob WebSocket message:", error);
@@ -40,7 +46,6 @@ const Restaurant = () => {
                 };
                 reader.readAsText(event.data);
             } else {
-                // Handle JSON string data
                 try {
                     const messageData = JSON.parse(event.data);
                     updateOrders(messageData);
@@ -50,20 +55,32 @@ const Restaurant = () => {
             }
         };
 
-        // WebSocket error handling
         socket.onerror = (error) => {
             console.error('WebSocket Error: ', error);
         };
 
+        // WebSocket reconnection logic on close
+        socket.onclose = () => {
+            console.log('WebSocket closed. Attempting reconnection...');
+            setTimeout(() => {
+                socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+            }, 5000); // Reconnect after 5 seconds
+        };
+
         const updateOrders = (messageData) => {
             // Update the orders when a message is received from the WebSocket
-            setOrders(prevOrders =>
+            setOrders((prevOrders) =>
                 prevOrders.map(order =>
                     order.orderNumber === messageData.orderNumber
                         ? { ...order, status: messageData.status }
                         : order
                 )
             );
+        };
+
+        // Cleanup WebSocket when the component unmounts
+        return () => {
+            socket.close();
         };
     }, []);
 
@@ -76,23 +93,13 @@ const Restaurant = () => {
         setReadyOrders(filteredReadyOrders);
     }, [orders]);
 
-    const [images] = useState([
-        "image1.jpg",
-        "image2.jpg",
-        "image3.jpg",
-        "image4.jpg",
-        "image5.jpg"
-    ]);
-
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
     // Image carousel effect
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
         }, 3000);
 
-        return () => clearInterval(intervalId);
+        return () => clearInterval(intervalId); // Cleanup interval on unmount
     }, [images.length]);
 
     return (
@@ -107,7 +114,7 @@ const Restaurant = () => {
                         {preppingOrders.map(order => (
                             <div
                                 key={order.orderNumber}
-                                className="border-black border-b-2 p-2 justify justify-between flex"
+                                className="border-black border-b-2 p-2 justify-between flex"
                             >
                                 <div className="font-bold text-3xl">{order.orderNumber}</div>
                                 <div className="font-bold text-3xl">{order.customerName}</div>
@@ -133,7 +140,7 @@ const Restaurant = () => {
                         {readyOrders.map(order => (
                             <div
                                 key={order.orderNumber}
-                                className="border-black border-b-2 p-2 justify justify-between flex"
+                                className="border-black border-b-2 p-2 justify-between flex"
                             >
                                 <div className="font-bold text-3xl">{order.orderNumber}</div>
                                 <div className="font-bold text-3xl">{order.customerName}</div>
