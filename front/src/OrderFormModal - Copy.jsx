@@ -1,13 +1,12 @@
-import React, { useState,useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import './modal.css';
 
 const OrderFormModal = ({ onClose, onSubmit }) => {
   const [customerName, setCustomerName] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
   const [orderItems, setOrderItems] = useState('');
-  const hasSaved = useRef(false); // To track if the order has already been saved
-  // const socket = new WebSocket('ws://localhost:8081'); // WebSocket connection
-  const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+  const hasSaved = useRef(false);  // To track if the order has already been saved
+  const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');  // WebSocket connection
 
   const formatDateTime = () => {
     const today = new Date();
@@ -21,17 +20,38 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    const itemsArray = orderItems.split(',');
+    const itemsArray = orderItems.split(',').map(item => ({
+      name: item.trim()  // Only store the name of the item
+    }));
+
     const newOrder = {
       orderNumber,
       customerName,
-      orderItems: itemsArray,
+      orderItems: itemsArray,  // Send only the name for each item
       date: formatDateTime(),
       status: 0,
     };
+
     onSubmit(newOrder);
+    submitOrderToDatabase(newOrder);  // Save the order to the database
   };
 
+  // Function to submit the order to the backend
+  const submitOrderToDatabase = async (orderDetails) => {
+    try {
+      const response = await fetch('https://chic-chicken-backend.herokuapp.com/createOrder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderDetails),  // Send the order details as JSON
+      });
+      const data = await response.json();
+      console.log('Order submitted successfully to the database:', data);
+    } catch (error) {
+      console.error('Error submitting order to the database:', error);
+    }
+  };
 
   // This useEffect will handle sending the message via WebSocket and saving to local storage
   useEffect(() => {
@@ -43,7 +63,9 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
         const newOrder = {
           orderNumber,
           customerName,
-          orderItems: orderItems.split(','),
+          orderItems: orderItems.split(',').map(item => ({
+            name: item.trim()  // Only store the name of the item
+          })),
           date: formatDateTime(),
           status: 0,
         };
@@ -63,8 +85,6 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
     }
   }, [orderNumber, customerName, orderItems, socket]);
 
-
-  
   return (
     <div className="modal-overlay">
       <div className="flex flex-col text-sm modal-content space-y-2 bg-[#fff2cd] border-2 border-gray-800 p-4">

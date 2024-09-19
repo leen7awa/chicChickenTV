@@ -5,76 +5,57 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
   const [customerName, setCustomerName] = useState('');
   const [orderNumber, setOrderNumber] = useState('');
   const [orderItems, setOrderItems] = useState('');
-  const hasSaved = useRef(false); // To track if the order has already been saved
-  const [checkSubmit, setCheckSubmit] = useState(false);
-  
-  const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+  const hasSaved = useRef(false);  // To track if the order has already been saved
+  const socket = new WebSocket('ws://localhost:8081');  // WebSocket connection
 
-  // Function to format the current date and time
-  const formatDateTime = () => {
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = String(today.getFullYear()).slice(-2);
-    const hours = String(today.getHours()).padStart(2, '0');
-    const minutes = String(today.getMinutes()).padStart(2, '0');
-    const seconds = String(today.getSeconds()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-  };
+  // Get current date and time in a format compatible with MongoDB
+  const currentDate = new Date().toLocaleString();
 
-  // Handle form submission
   const handleSubmit = () => {
-    if (!customerName || !orderNumber || !orderItems) {
-      alert("Please fill all the fields.");
-      return;
-    }
-    const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
-    const isOrderNumberExists = existingOrders.some(order => order.orderNumber === orderNumber);
+    const itemsArray = orderItems.split(',').map(item => ({
+      name: item.trim()  // Only store the name of the item
+    }));
 
-    if (isOrderNumberExists) {
-      alert(`Order number ${orderNumber} already exists.`);
-      return;
-    }
-
-    const itemsArray = orderItems.split(',');
     const newOrder = {
       orderNumber,
       customerName,
-      orderItems: itemsArray,
-      date: formatDateTime(),
-      status: 0, // Initial status
+      orderItems: itemsArray,  // Send only the name for each item
+      date: currentDate,  // Use the new date format
+      status: 0,
     };
 
-    onSubmit(newOrder);
-    saveOrder(newOrder);
-    setCheckSubmit(false);
-  };
+    // Ensure we only save the order once
+    if (!hasSaved.current) {
+      onSubmit(newOrder);
 
-  // Function to save the order and send it via WebSocket
-  const saveOrder = (newOrder) => {
-    const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
-    const updatedOrders = [...existingOrders, newOrder];
-    localStorage.setItem('orders', JSON.stringify(updatedOrders));
+      // WebSocket: Wait until the connection is open before sending the message
+      socket.onopen = () => {
+        socket.send(JSON.stringify(newOrder));  // Send new order through WebSocket
+      };
 
-    // Emit WebSocket message to inform other components
-    socket.onopen = () => {
-      socket.send(JSON.stringify(newOrder));
-    };
+      // Send the order data to the backend (MongoDB)
+      submitOrderToDatabase(newOrder);
 
-    socket.onerror = (error) => {
-      console.error('WebSocket Error: ', error);
-    };
-
-    hasSaved.current = true;
-  };
-
-  useEffect(() => {
-    if (checkSubmit) {
-      if (!hasSaved.current && orderNumber && customerName && orderItems) {
-        handleSubmit();
-      }
+      hasSaved.current = true;  // Mark the order as saved to prevent duplicates
     }
-  }, [checkSubmit, orderNumber, customerName, orderItems]);
+  };
+
+  // Function to submit the order to the backend
+  const submitOrderToDatabase = async (orderDetails) => {
+    try {
+      const response = await fetch('http://localhost:8081/createOrder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderDetails),  // Send the order details as JSON
+      });
+      const data = await response.json();
+      console.log('Order submitted successfully to the database:', data);
+    } catch (error) {
+      console.error('Error submitting order to the database:', error);
+    }
+  };
 
   return (
     <div className="modal-overlay">
@@ -114,7 +95,7 @@ const OrderFormModal = ({ onClose, onSubmit }) => {
         <div className="flex justify-between mt-4">
           <button
             className="bg-green-500 text-white px-4 py-2 rounded"
-            onClick={() => setCheckSubmit(true)}
+            onClick={handleSubmit}
           >
             שמור
           </button>
