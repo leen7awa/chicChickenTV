@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import RestaurantHeader from "./RestaurantHeader";
 
 // Initialize WebSocket connection
-const socket = new WebSocket('ws://localhost:8081/');
-
+// const socket = new WebSocket('ws://localhost:8081/');
+const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 const Restaurant = () => {
     const [orders, setOrders] = useState([]); // State to store orders from the database
     const [readyOrders, setReadyOrders] = useState([]);
@@ -13,7 +13,7 @@ const Restaurant = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch('http://localhost:8081/orders'); // Replace with your backend URL
+                const response = await fetch('http://chic-chicken-oss-929342691ddb.herokuapp.com/orders'); // Replace with your backend URL
                 const data = await response.json();
                 setOrders(data); // Set orders fetched from the backend
             } catch (error) {

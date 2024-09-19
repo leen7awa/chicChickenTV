@@ -6,8 +6,8 @@ import './card.css';
 
 // Initialize WebSocket connection
 // const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
-// const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
-const socket = new WebSocket('ws://localhost:8081/');
+const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+// const socket = new WebSocket('ws://localhost:8081/');
 
 const Kitchen = () => {
     const [orders, setOrders] = useState([]); // Initialize with an empty array
@@ -32,7 +32,8 @@ const Kitchen = () => {
         // Fetch orders from the backend
         const fetchOrders = async () => {
             try {
-                const response = await fetch('http://localhost:8081/orders'); // Update with your backend URL
+                // const response = await fetch('http://localhost:8081/orders'); // Update with your backend URL
+                const response = await fetch('https://chic-chicken-oss-929342691ddb.herokuapp.com/orders'); // Update with your backend URL
                 const data = await response.json();
                 setOrders(data); // Set the orders with the data from the backend
             } catch (error) {

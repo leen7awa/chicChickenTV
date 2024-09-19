@@ -6,7 +6,8 @@ import Header from './Header';
 import './card.css';
 
 // Initialize WebSocket connection
-const socket = new WebSocket('ws://localhost:8081/');
+// const socket = new WebSocket('ws://localhost:8081/');
+const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 
 const Counter = () => {
     const [orders, setOrders] = useState([]); // Initialize with an empty array
@@ -34,7 +35,7 @@ const Counter = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch('http://localhost:8081/orders'); // Fetch from backend
+                const response = await fetch('https://chic-chicken-oss-929342691ddb.herokuapp.com/orders'); // Fetch from backend
                 const data = await response.json();
                 setOrders(data); // Set orders fetched from the database
             } catch (error) {
@@ -95,7 +96,7 @@ const Counter = () => {
     // Function to delete the order from the database
     const deleteOrderFromDB = async (orderNumber) => {
         try {
-            const response = await fetch(`http://localhost:8081/orders/${orderNumber}`, {
+            const response = await fetch(`http://chic-chicken-oss-929342691ddb.herokuapp.com/orders/${orderNumber}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
