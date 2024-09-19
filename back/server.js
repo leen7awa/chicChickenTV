@@ -12,7 +12,7 @@ const port = process.env.PORT || 8081;
 app.use(express.json());
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://chic-chicken-tv.vercel.app/'],  // Allow localhost and production domain
+  origin: ['http://localhost:5173', 'https://chic-chicken-tv.vercel.app'],  // Correct URL without trailing slash
   methods: ['GET', 'POST', 'DELETE', 'PUT'], // Include all necessary methods
 }));
 

@@ -13,7 +13,7 @@ const Restaurant = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch('http://chic-chicken-oss-929342691ddb.herokuapp.com/orders'); // Replace with your backend URL
+                const response = await fetch('https://chic-chicken-oss-929342691ddb.herokuapp.com/orders'); // Replace with your backend URL
                 const data = await response.json();
                 setOrders(data); // Set orders fetched from the backend
             } catch (error) {
