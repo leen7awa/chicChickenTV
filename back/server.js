@@ -14,7 +14,7 @@ app.use(express.json());
 // Enable CORS for all routes
 app.use(cors({
   origin: 'http://localhost:5173',  // Allow requests from the frontend
-  methods: ['GET', 'POST'],  // Allow only GET and POST methods
+  methods: ['GET', 'POST', 'DELETE'], 
 }));
 
 // MongoDB connection setup
@@ -34,45 +34,36 @@ const wss = new WebSocket.Server({ server });
 // WebSocket connection logic
 wss.on('connection', async (ws) => {
   console.log('New client connected');
-
-  try {
-    // Fetch current orders from MongoDB and send to the client
-    const orders = await Order.find();
-    ws.send(JSON.stringify(orders));
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    ws.send(JSON.stringify({ error: 'Failed to load orders' }));
-  }
-
+  
   ws.on('message', async (message) => {
-    console.log(`Received: ${message}`);
+    console.log(`Received message: ${message}`);
 
-    // Parse the incoming message as JSON
-    const orderUpdate = JSON.parse(message);
-    const { orderNumber, customerName, orderItems, date, status } = orderUpdate;
-
+    // Try to parse the message
     try {
-      // Create and save new order to MongoDB
-      const newOrder = new Order({
-        orderNumber,
-        customerName,
-        orderItems,
-        date,
-        status
-      });
-      await newOrder.save();
+      const parsedMessage = JSON.parse(message);
+      console.log('Parsed message:', parsedMessage);
 
-      console.log('Order saved to MongoDB:', newOrder);
+      // Update the database and broadcast the updated orders
+      const { orderNumber, status } = parsedMessage;
+      console.log(`Updating order: ${orderNumber}, status: ${status}`);
 
-      // Fetch updated orders and broadcast to all clients
-      const updatedOrders = await Order.find();
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(updatedOrders));
-        }
-      });
+      // Update order in MongoDB
+      const updatedOrder = await Order.findOneAndUpdate({ orderNumber }, { status }, { new: true });
+      
+      if (updatedOrder) {
+        console.log('Order updated successfully:', updatedOrder);
+        const updatedOrders = await Order.find();
+        // Broadcast the updated order to all clients
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(updatedOrders));
+          }
+        });
+      } else {
+        console.error('Order not found');
+      }
     } catch (error) {
-      console.error('Error saving order to MongoDB:', error);
+      console.error('Error handling message:', error);
     }
   });
 
@@ -110,6 +101,22 @@ app.post('/createOrder', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+app.delete('/orders/:orderNumber', async (req, res) => {
+  const { orderNumber } = req.params;
+
+  try {
+      const deletedOrder = await Order.findOneAndDelete({ orderNumber });
+      if (deletedOrder) {
+          res.status(200).json({ message: 'Order deleted successfully' });
+      } else {
+          res.status(404).json({ message: 'Order not found' });
+      }
+  } catch (error) {
+      res.status(500).json({ error: 'Error deleting the order' });
+  }
+});
+
 
 // Start the server
 server.listen(port, () => {

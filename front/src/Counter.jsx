@@ -6,10 +6,11 @@ import Header from './Header';
 import './card.css';
 
 // Initialize WebSocket connection
-const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+const socket = new WebSocket('ws://localhost:8081/');
 
-const Counter = ({ orders, setOrders }) => {
-    const [statusFilters, setStatusFilters] = useState([false, false, true, false]); // Default to show all statuses
+const Counter = () => {
+    const [orders, setOrders] = useState([]); // Initialize with an empty array
+    const [statusFilters, setStatusFilters] = useState([false, false, true, false]); // Default to show specific statuses
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [finishOrderItem, setFinishOrderItem] = useState('');
     const [showOrderDetails, setShowOrderDetails] = useState(false); // State for order details modal
@@ -29,8 +30,21 @@ const Counter = ({ orders, setOrders }) => {
         });
     };
 
-    // WebSocket message handler
+    // Fetch orders from the database
     useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch('http://localhost:8081/orders'); // Fetch from backend
+                const data = await response.json();
+                setOrders(data); // Set orders fetched from the database
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        };
+
+        fetchOrders(); // Fetch orders when component mounts
+
+        // WebSocket message handler
         socket.onmessage = (event) => {
             if (event.data instanceof Blob) {
                 // Handle Blob data
@@ -76,7 +90,22 @@ const Counter = ({ orders, setOrders }) => {
             });
         };
 
-    }, [setOrders]);
+    }, []);
+
+    // Function to delete the order from the database
+    const deleteOrderFromDB = async (orderNumber) => {
+        try {
+            const response = await fetch(`http://localhost:8081/orders/${orderNumber}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error('Failed to delete the order');
+            }
+            console.log(`Order ${orderNumber} deleted successfully`);
+        } catch (error) {
+            console.error('Error deleting order:', error);
+        }
+    };
 
     // Filter orders based on their status
     const filteredOrders = orders.filter((order) => statusFilters[order.status]);
@@ -159,11 +188,13 @@ const Counter = ({ orders, setOrders }) => {
             {showConfirmation && (
                 <ConfirmationModal
                     message={<span dir="rtl">לסיים את ההזמנה?</span>}
-                    onConfirm={() => {
-                        // Remove the order from the list and update local storage
+                    onConfirm={async () => {
+                        // Remove the order from the database
+                        await deleteOrderFromDB(finishOrderItem.orderNumber);
+
+                        // Remove the order from the list
                         setOrders(prevOrders => {
                             const updatedOrders = prevOrders.filter(order => order.orderNumber !== finishOrderItem.orderNumber);
-                            localStorage.setItem('orders', JSON.stringify(updatedOrders));
                             return updatedOrders;
                         });
                         setShowConfirmation(false);

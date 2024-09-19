@@ -5,9 +5,12 @@ import OrderDetailsModal from './OrderDetailsModal'; // Import your modal compon
 import './card.css';
 
 // Initialize WebSocket connection
-const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+// const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+// const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+const socket = new WebSocket('ws://localhost:8081/');
 
-const Kitchen = ({ orders, setOrders }) => {
+const Kitchen = () => {
+    const [orders, setOrders] = useState([]); // Initialize with an empty array
     const [statusFilters, setStatusFilters] = useState([true, true, true]); // Default to show all statuses
     const [showOrderDetails, setShowOrderDetails] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null); // Store the selected order
@@ -26,13 +29,27 @@ const Kitchen = ({ orders, setOrders }) => {
     };
 
     useEffect(() => {
+        // Fetch orders from the backend
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch('http://localhost:8081/orders'); // Update with your backend URL
+                const data = await response.json();
+                setOrders(data); // Set the orders with the data from the backend
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        };
+
+        fetchOrders(); // Fetch orders when component mounts
+
         // WebSocket message handler
         socket.onmessage = (event) => {
+            let messageData;
             if (event.data instanceof Blob) {
                 const reader = new FileReader();
                 reader.onload = () => {
                     try {
-                        const messageData = JSON.parse(reader.result); // Assuming the blob contains JSON data
+                        messageData = JSON.parse(reader.result); // Assuming the blob contains JSON data
                         handleMessage(messageData);
                     } catch (error) {
                         console.error("Error processing Blob WebSocket message:", error);
@@ -42,7 +59,7 @@ const Kitchen = ({ orders, setOrders }) => {
             } else {
                 // Handle JSON data
                 try {
-                    const messageData = JSON.parse(event.data);
+                    messageData = JSON.parse(event.data);
                     handleMessage(messageData);
                 } catch (error) {
                     console.error("Error processing WebSocket message:", error);
@@ -50,27 +67,38 @@ const Kitchen = ({ orders, setOrders }) => {
             }
         };
 
-        // WebSocket error handling
-        socket.onerror = (error) => {
-            console.error('WebSocket Error: ', error);
-        };
-
         const handleMessage = (messageData) => {
+            console.log("Received WebSocket message:", messageData);
+        
+            // If it's not an array or object, log an error
+            if (typeof messageData !== 'object') {
+                console.error('Expected messageData to be an object, but got:', messageData);
+                return;
+            }
+        
             setOrders(prevOrders => {
                 const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
-
                 if (orderExists) {
-                    // Update the order if it already exists
+                    // Update the existing order
                     return prevOrders.map(order =>
-                        order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                        order.orderNumber === messageData.orderNumber ? { ...order, ...messageData } : order
                     );
                 } else {
-                    // Add the new order if it doesn't exist
+                    // Add the new order
                     return [...prevOrders, messageData];
                 }
             });
         };
-    }, [setOrders]);
+        
+        
+        
+        
+
+        // WebSocket error handling
+        socket.onerror = (error) => {
+            console.error('WebSocket Error: ', error);
+        };
+    }, []);
 
     // Filter orders based on the statusFilters array
     const filteredOrders = orders.filter((order) => statusFilters[order.status]);
