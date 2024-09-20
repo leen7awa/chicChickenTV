@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 // import Header from "./Header";
 import RestaurantHeader from "./RestaurantHeader";
 
-// const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
-const socket = new WebSocket('ws://localhost:8081');
+const socket = new WebSocket('https://chic-chicken-oss-929342691ddb.herokuapp.com/');
+// const socket = new WebSocket('ws://localhost:8081');
 
 const Restaurant = ({ orders, setOrders }) => {
 
@@ -15,18 +15,33 @@ const Restaurant = ({ orders, setOrders }) => {
     useEffect(() => {
         socket.onmessage = (event) => {
             try {
-                // event.data is already a string, no need for .text()
-                const messageData = JSON.parse(event.data);
-    
-                // Update the orders when a message is received from the WebSocket
-                setOrders(prevOrders => prevOrders.map(order =>
-                    order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                ));
+                // Check if event.data is a Blob
+                if (event.data instanceof Blob) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const messageData = JSON.parse(reader.result);
+                        
+                        // Update the orders when a message is received from the WebSocket
+                        setOrders(prevOrders => prevOrders.map(order =>
+                            order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                        ));
+                    };
+                    reader.readAsText(event.data); // Convert Blob to text
+                } else {
+                    // If it's not a Blob, handle it as JSON
+                    const messageData = JSON.parse(event.data);
+                    
+                    // Update the orders
+                    setOrders(prevOrders => prevOrders.map(order =>
+                        order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                    ));
+                }
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
             }
         };
     }, [setOrders]);
+    
 
     useEffect(() => {
         const filteredPreppingOrders = orders.filter(order => order.status === 1);

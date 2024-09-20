@@ -5,8 +5,8 @@ import OrderDetailsModal from './OrderDetailsModal'; // Import your modal compon
 import Header from './Header';
 import './card.css';
 
-// const socket = new WebSocket('wss://chickenserver-601a0b60e55d.herokuapp.com/');
-const socket = new WebSocket('ws://localhost:8081');
+const socket = new WebSocket('https://chic-chicken-oss-929342691ddb.herokuapp.com/');
+// const socket = new WebSocket('ws://localhost:8081');
 
 const Counter = ({ orders, setOrders }) => {
     const [statusFilters, setStatusFilters] = useState([false, false, true, false]); // Default to show all statuses
@@ -29,44 +29,54 @@ const Counter = ({ orders, setOrders }) => {
         });
     };
 
-    // useEffect(() => {
-    //     socket.onmessage = (event) => {
-    //         try {
-    //             // event.data is already a string, no need for .text()
-    //             const messageData = JSON.parse(event.data);
-
-    //             // Update the orders when a message is received from the WebSocket
-    //             setOrders(prevOrders => prevOrders.map(order =>
-    //                 order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-    //             ));
-    //         } catch (error) {
-    //             console.error("Error processing WebSocket message:", error);
-    //         }
-    //     };
-    // }, [setOrders]);
     useEffect(() => {
         socket.onmessage = (event) => {
             try {
-                const messageData = JSON.parse(event.data);
-    
-                setOrders(prevOrders => {
-                    const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
-    
-                    if (orderExists) {
-                        // Update the order if it already exists
-                        return prevOrders.map(order =>
-                            order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                        );
-                    } else {
-                        // Add the new order if it doesn't exist
-                        return [...prevOrders, messageData];
-                    }
-                });
+                // Check if event.data is a Blob
+                if (event.data instanceof Blob) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const messageData = JSON.parse(reader.result);
+                        
+                        setOrders(prevOrders => {
+                            const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
+        
+                            if (orderExists) {
+                                // Update the order if it already exists
+                                return prevOrders.map(order =>
+                                    order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                                );
+                            } else {
+                                // Add the new order if it doesn't exist
+                                return [...prevOrders, messageData];
+                            }
+                        });
+                    };
+                    reader.readAsText(event.data); // Convert Blob to text
+                } else {
+                    // If it's not a Blob, handle it as JSON
+                    const messageData = JSON.parse(event.data);
+                    
+                    setOrders(prevOrders => {
+                        const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
+        
+                        if (orderExists) {
+                            // Update the order if it already exists
+                            return prevOrders.map(order =>
+                                order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                            );
+                        } else {
+                            // Add the new order if it doesn't exist
+                            return [...prevOrders, messageData];
+                        }
+                    });
+                }
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
             }
         };
     }, [setOrders]);
+    
 
 
     // Filter orders to include only those with status < 3
