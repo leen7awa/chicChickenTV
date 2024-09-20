@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import './windowMsg.css';
+import './modal.css';
 
 const OrderFormModal = ({ onClose, onSubmit }) => {
   const [customerName, setCustomerName] = useState('');
