@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 // import Header from "./Header";
 import RestaurantHeader from "./RestaurantHeader";
 
-const socket = new WebSocket('https://chic-chicken-oss-929342691ddb.herokuapp.com/');
+const socket = new WebSocket('https://chic-3f6f814fd85b.herokuapp.com/');
 // const socket = new WebSocket('ws://localhost:8081');
 
 const Restaurant = ({ orders, setOrders }) => {
