@@ -5,19 +5,18 @@ import OrderDetailsModal from './OrderDetailsModal'; // Import your modal compon
 import Header from './Header';
 import './card.css';
 
-// Initialize WebSocket connection
-// const socket = new WebSocket('ws://localhost:8081/');
-const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+// const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
+const socket = new WebSocket('wss://chic-3f6f814fd85b.herokuapp.com/');
+// const socket = new WebSocket('ws://localhost:8081');
 
-const Counter = () => {
-    const [orders, setOrders] = useState([]); // Initialize with an empty array
-    const [statusFilters, setStatusFilters] = useState([false, false, true, false]); // Default to show specific statuses
+const Counter = ({ orders, setOrders }) => {
+    const [statusFilters, setStatusFilters] = useState([false, false, true, false]); // Default to show all statuses
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [finishOrderItem, setFinishOrderItem] = useState('');
     const [showOrderDetails, setShowOrderDetails] = useState(false); // State for order details modal
+    const [orderDetails, setOrderDetails] = useState([]); // State for order items
     const [selectedOrder, setSelectedOrder] = useState(null);
 
-    // Function to send WebSocket messages
     const sendMessage = (orderNumber, newStatus) => {
         const message = JSON.stringify({ orderNumber, status: newStatus });
         socket.send(message); // Send order number and new status to WebSocket
@@ -31,84 +30,57 @@ const Counter = () => {
         });
     };
 
-    // Fetch orders from the database
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await fetch('https://chic-chicken-oss-929342691ddb.herokuapp.com/orders'); // Fetch from backend
-                const data = await response.json();
-                setOrders(data); // Set orders fetched from the database
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-            }
-        };
-
-        fetchOrders(); // Fetch orders when component mounts
-
-        // WebSocket message handler
         socket.onmessage = (event) => {
-            if (event.data instanceof Blob) {
-                // Handle Blob data
-                const reader = new FileReader();
-                reader.onload = () => {
-                    try {
-                        const messageData = JSON.parse(reader.result); // Assuming the blob contains JSON data
-                        handleMessage(messageData);
-                    } catch (error) {
-                        console.error("Error processing Blob WebSocket message:", error);
-                    }
-                };
-                reader.readAsText(event.data);
-            } else {
-                // Handle JSON data
-                try {
-                    const messageData = JSON.parse(event.data);
-                    handleMessage(messageData);
-                } catch (error) {
-                    console.error("Error processing WebSocket message:", error);
-                }
-            }
-        };
-
-        // WebSocket error handling
-        socket.onerror = (error) => {
-            console.error('WebSocket Error: ', error);
-        };
-
-        const handleMessage = (messageData) => {
-            setOrders(prevOrders => {
-                const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
-
-                if (orderExists) {
-                    // Update the order if it already exists
-                    return prevOrders.map(order =>
-                        order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
-                    );
+            try {
+                // Check if event.data is a Blob
+                if (event.data instanceof Blob) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const messageData = JSON.parse(reader.result);
+                        
+                        setOrders(prevOrders => {
+                            const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
+        
+                            if (orderExists) {
+                                // Update the order if it already exists
+                                return prevOrders.map(order =>
+                                    order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                                );
+                            } else {
+                                // Add the new order if it doesn't exist
+                                return [...prevOrders, messageData];
+                            }
+                        });
+                    };
+                    reader.readAsText(event.data); // Convert Blob to text
                 } else {
-                    // Add the new order if it doesn't exist
-                    return [...prevOrders, messageData];
+                    // If it's not a Blob, handle it as JSON
+                    const messageData = JSON.parse(event.data);
+                    
+                    setOrders(prevOrders => {
+                        const orderExists = prevOrders.some(order => order.orderNumber === messageData.orderNumber);
+        
+                        if (orderExists) {
+                            // Update the order if it already exists
+                            return prevOrders.map(order =>
+                                order.orderNumber === messageData.orderNumber ? { ...order, status: messageData.status } : order
+                            );
+                        } else {
+                            // Add the new order if it doesn't exist
+                            return [...prevOrders, messageData];
+                        }
+                    });
                 }
-            });
-        };
-
-    }, []);
-
-    // Function to delete the order from the database
-    const deleteOrderFromDB = async (orderNumber) => {
-        try {
-            const response = await fetch(`https://chic-chicken-oss-929342691ddb.herokuapp.com/orders/${orderNumber}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
-                throw new Error('Failed to delete the order');
+            } catch (error) {
+                console.error("Error processing WebSocket message:", error);
             }
-            console.log(`Order ${orderNumber} deleted successfully`);
-        } catch (error) {
-            console.error('Error deleting order:', error);
-        }
-    };
+        };
+    }, [setOrders]);
+    
 
-    // Filter orders based on their status
+
+    // Filter orders to include only those with status < 3
     const filteredOrders = orders.filter((order) => statusFilters[order.status]);
 
     return (
@@ -116,7 +88,7 @@ const Counter = () => {
             <div className="bg-[#ffa900] h-screen overflow-y-auto">
                 <Header title='דלפק' onToggleStatuses={setStatusFilters} /> {/* Pass the toggle handler */}
 
-                <div
+                {<div
                     style={{
                         display: 'flex',
                         flexWrap: 'wrap',
@@ -158,7 +130,7 @@ const Counter = () => {
                                         <button
                                             className="px-4 py-1 bg-gray-600 font-bold rounded-2xl border-2 border-gray-800"
                                             onClick={() => {
-                                                setSelectedOrder(order); // Set order items
+                                                setSelectedOrder(order);// Set order items
                                                 setShowOrderDetails(true); // Show the modal
                                             }}
                                         >
@@ -183,26 +155,34 @@ const Counter = () => {
                     ) : (
                         <div className='text-gray-800 font-mono mt-44 text-3xl font-bold'>אין הזמנות</div>
                     )}
-                </div>
+                </div>}
             </div>
 
             {showConfirmation && (
                 <ConfirmationModal
                     message={<span dir="rtl">לסיים את ההזמנה?</span>}
-                    onConfirm={async () => {
-                        // Remove the order from the database
-                        await deleteOrderFromDB(finishOrderItem.orderNumber);
-
-                        // Remove the order from the list
+                    onConfirm={() => {
+                        // sendMessage(finishOrderItem,3);
+                        // Remove the order from the list and update local storage
                         setOrders(prevOrders => {
+                            // Filter out the finished order
                             const updatedOrders = prevOrders.filter(order => order.orderNumber !== finishOrderItem.orderNumber);
+
+                            // Update local storage to reflect the deletion
+                            localStorage.setItem('orders', JSON.stringify(updatedOrders));
+
                             return updatedOrders;
                         });
+
+                        // Close the confirmation modal
                         setShowConfirmation(false);
                     }}
                     onCancel={() => setShowConfirmation(false)}
                 />
             )}
+
+
+
 
             {showOrderDetails && selectedOrder && ( // Show the order details modal when triggered
                 <OrderDetailsModal
