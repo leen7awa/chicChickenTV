@@ -4,7 +4,7 @@ import Header from './Header';
 import OrderDetailsModal from './OrderDetailsModal'; // Import your modal component
 import './card.css';
 
-const socket = new WebSocket('https://chic-3f6f814fd85b.herokuapp.com/');
+const socket = new WebSocket('wss://chic-3f6f814fd85b.herokuapp.com/');
 // const socket = new WebSocket('ws://localhost:8081');
 
 const Kitchen = ({ orders, setOrders }) => {

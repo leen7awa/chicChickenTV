@@ -5,7 +5,7 @@ import OrderDetailsModal from './OrderDetailsModal'; // Import your modal compon
 import Header from './Header';
 import './card.css';
 
-const socket = new WebSocket('https://chic-chicken-oss-929342691ddb.herokuapp.com/');
+const socket = new WebSocket('wss://chic-chicken-oss-929342691ddb.herokuapp.com/');
 // const socket = new WebSocket('ws://localhost:8081');
 
 const Counter = ({ orders, setOrders }) => {
